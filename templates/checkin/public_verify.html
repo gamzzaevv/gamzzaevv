@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Проверка билета | {{ SITE_NAME }}{% endblock %}
+{% block robots %}noindex,nofollow{% endblock %}
+
+{% block body %}
+<main class="success-page">
+    <div class="container">
+        <div class="success-card">
+            {% if ticket %}
+                {% if ticket.status == "issued" %}
+                    <div class="success-icon" style="background:#dcfce7;color:#166534">✓</div>
+                    <h1>Билет действителен</h1>
+                {% elif ticket.status == "used" %}
+                    <div class="success-icon" style="background:#fee2e2;color:#991b1b">✗</div>
+                    <h1>Билет уже использован</h1>
+                {% elif ticket.status == "canceled" %}
+                    <div class="success-icon" style="background:#fee2e2;color:#991b1b">✗</div>
+                    <h1>Билет отменён</h1>
+                {% else %}
+                    <div class="success-icon" style="background:#fef9c3;color:#854d0e">!</div>
+                    <h1>{{ ticket.get_status_display }}</h1>
+                {% endif %}
+
+                {% with event=ticket.order.ticket_type.event %}
+                <p><strong>{{ event.title }}</strong></p>
+                <p>{{ event.starts_at|date:"d.m.Y H:i" }} МСК · {{ event.venue_name }}</p>
+                {% endwith %}
+                <p>{{ ticket.order.ticket_type.name }} · {{ ticket.ticket_number }}</p>
+
+                <p class="success-note">
+                    Это информационная страница. Отметка о входе ставится оператором при сканировании.
+                </p>
+            {% else %}
+                <div class="success-icon" style="background:#fee2e2;color:#991b1b">✗</div>
+                <h1>Билет не найден</h1>
+                <p class="success-note">Проверьте корректность ссылки или QR-кода.</p>
+            {% endif %}
+            <a href="/" class="btn btn--secondary" style="margin-top:24px">На главную</a>
+        </div>
+    </div>
+</main>
+{% endblock %}

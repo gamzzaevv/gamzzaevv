@@ -24,6 +24,10 @@ class OrderForm(forms.Form):
         validators=[RegexValidator(r"^\+?[\d\s\-\(\)]{7,20}$", "Некорректный номер телефона")],
         widget=forms.TextInput(attrs={"autocomplete": "tel", "placeholder": "+7 999 000-00-00"})
     )
+    quantity = forms.IntegerField(
+        label="Количество", min_value=1, max_value=10, initial=1,
+        widget=forms.NumberInput(attrs={"min": 1, "max": 10})
+    )
     promo_code = forms.CharField(label="Промокод", max_length=50, required=False)
     consent = forms.BooleanField(
         label=(
@@ -52,3 +56,11 @@ class OrderForm(forms.Form):
         if any(c.isdigit() for c in v):
             raise forms.ValidationError("Фамилия не должна содержать цифры")
         return v
+
+    def clean_quantity(self):
+        qty = self.cleaned_data["quantity"]
+        if self.ticket_type and qty > self.ticket_type.available_quantity:
+            raise forms.ValidationError(
+                f"Доступно только {self.ticket_type.available_quantity} билетов"
+            )
+        return qty

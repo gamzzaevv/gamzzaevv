@@ -38,7 +38,6 @@ def send_ticket_email(self, ticket_id: str):
 def retry_failed_emails():
     """Periodic task: retry emails not yet sent after 10 minutes."""
     from apps.orders.models import Ticket, Order
-    from django.utils import timezone
     import datetime
 
     cutoff = timezone.now() - datetime.timedelta(minutes=10)

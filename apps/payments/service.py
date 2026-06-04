@@ -17,6 +17,7 @@ import yookassa
 from yookassa import Configuration, Payment as YKPayment
 from yookassa.domain.notification import WebhookNotificationFactory
 
+from apps.events.models import TicketType
 from apps.orders.models import Order
 from apps.payments.models import Payment, WebhookEvent
 
@@ -152,13 +153,17 @@ def _handle_payment_succeeded(body: dict) -> None:
         order.status = Order.STATUS_PAID
         order.save(update_fields=["status", "updated_at"])
 
-        # Release reservation, increment sold count
-        tt = order.ticket_type
-        tt.sold_quantity = tt.__class__.objects.filter(pk=tt.pk).values_list(
-            "sold_quantity", flat=True
-        ).first() + order.quantity
-        tt.reserved_quantity = max(0, tt.reserved_quantity - order.quantity)
-        tt.save(update_fields=["sold_quantity", "reserved_quantity", "updated_at"])
+        # Release reservation, increment sold count atomically (F expressions
+        # avoid read-modify-write races under concurrent webhooks).
+        from django.db.models import F, Value
+        from django.db.models.functions import Greatest
+        TicketType.objects.filter(pk=order.ticket_type_id).update(
+            sold_quantity=F("sold_quantity") + order.quantity,
+            reserved_quantity=Greatest(
+                F("reserved_quantity") - order.quantity, Value(0)
+            ),
+            updated_at=timezone.now(),
+        )
 
     # Trigger async post-payment tasks (outside transaction)
     from tasks.payment_tasks import on_payment_succeeded

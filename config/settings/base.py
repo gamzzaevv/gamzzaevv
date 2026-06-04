@@ -234,11 +234,10 @@ AXES_RESET_ON_SUCCESS = True
 
 # ─── Django Allauth ──────────────────────────────────────────────────────────
 
-ACCOUNT_AUTHENTICATION_METHOD = "email"
-ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_LOGIN_METHODS = {"email"}
+ACCOUNT_SIGNUP_FIELDS = ["email*", "password1*", "password2*"]
 ACCOUNT_EMAIL_VERIFICATION = "mandatory"
 ACCOUNT_UNIQUE_EMAIL = True
-ACCOUNT_USERNAME_REQUIRED = False
 MFA_ADAPTER = "allauth.mfa.adapter.DefaultMFAAdapter"
 MFA_TOTP_PERIOD = 30
 

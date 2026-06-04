@@ -59,6 +59,12 @@
                     {{ form.phone }}
                 </div>
 
+                <div class="form-group {% if form.quantity.errors %}form-group--error{% endif %}">
+                    <label>{{ form.quantity.label }} *</label>
+                    {{ form.quantity }}
+                    {% if form.quantity.errors %}<span class="form-error">{{ form.quantity.errors.0 }}</span>{% endif %}
+                </div>
+
                 <div class="form-group">
                     <label>{{ form.promo_code.label }}</label>
                     <div class="promo-wrap">

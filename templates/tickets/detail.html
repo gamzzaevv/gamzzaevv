@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Билет {{ ticket.ticket_number }} | {{ SITE_NAME }}{% endblock %}
+{% block robots %}noindex,nofollow{% endblock %}
+
+{% block body %}
+<main class="legal-page">
+    <div class="container">
+        <article class="legal-article" style="max-width:520px;text-align:center">
+            <h1>🎫 Ваш билет</h1>
+
+            {% with event=ticket.order.ticket_type.event %}
+            <h2>{{ event.title }}</h2>
+            <p class="legal-meta">
+                {{ event.starts_at|date:"d.m.Y H:i" }} МСК · {{ event.venue_name }}, {{ event.venue_city }}
+            </p>
+            {% endwith %}
+
+            <div class="info-row"><span class="info-label">Владелец</span><strong>{{ ticket.order.customer.full_name }}</strong></div>
+            <div class="info-row"><span class="info-label">Тип билета</span><strong>{{ ticket.order.ticket_type.name }}</strong></div>
+            <div class="info-row"><span class="info-label">Номер заказа</span><strong>{{ ticket.order.order_number }}</strong></div>
+            <div class="info-row"><span class="info-label">Номер билета</span><strong>{{ ticket.ticket_number }}</strong></div>
+            <div class="info-row"><span class="info-label">Код проверки</span><strong>{{ ticket.verify_code }}</strong></div>
+            <div class="info-row">
+                <span class="info-label">Статус</span>
+                <strong>
+                    {% if ticket.status == "issued" %}<span style="color:#16a34a">✓ Действителен</span>
+                    {% elif ticket.status == "used" %}<span style="color:#dc2626">Использован</span>
+                    {% elif ticket.status == "canceled" %}<span style="color:#dc2626">Отменён</span>
+                    {% else %}{{ ticket.get_status_display }}{% endif %}
+                </strong>
+            </div>
+
+            {% if ticket.pdf_file %}
+            <a href="{{ ticket.pdf_file.url }}" class="btn btn--primary btn--full" style="margin-top:24px" download>
+                Скачать PDF-билет
+            </a>
+            {% endif %}
+
+            <p class="success-note" style="margin-top:20px">
+                Предъявите QR-код из PDF или письма на входе.
+            </p>
+        </article>
+    </div>
+</main>
+{% endblock %}
