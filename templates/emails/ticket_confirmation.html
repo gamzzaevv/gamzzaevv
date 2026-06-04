@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+  body { font-family: Inter, Arial, sans-serif; background: #f4f4f8; margin: 0; padding: 0; color: #1a1a2e; }
+  .wrapper { max-width: 560px; margin: 20px auto; background: #fff; border-radius: 12px; overflow: hidden; }
+  .header { background: #1a1a2e; padding: 32px 24px; text-align: center; }
+  .header h1 { color: #e94560; margin: 0; font-size: 24px; }
+  .header p { color: #aaa; margin: 8px 0 0; }
+  .body { padding: 32px 24px; }
+  .body h2 { color: #1a1a2e; margin-top: 0; }
+  .info-row { display: flex; justify-content: space-between; border-bottom: 1px solid #eee; padding: 10px 0; }
+  .info-label { color: #666; }
+  .btn { display: inline-block; background: #e94560; color: #fff; padding: 14px 28px; border-radius: 8px; text-decoration: none; font-weight: 700; margin: 20px 0; }
+  .qr-section { text-align: center; padding: 20px; background: #f4f4f8; border-radius: 8px; margin: 20px 0; }
+  .footer { background: #1a1a2e; color: #888; padding: 20px 24px; text-align: center; font-size: 12px; }
+  .footer a { color: #e94560; }
+</style>
+</head>
+<body>
+<div class="wrapper">
+  <div class="header">
+    <h1>{{ site_name }}</h1>
+    <p>Ваш билет подтверждён</p>
+  </div>
+  <div class="body">
+    <h2>Здравствуйте, {{ customer.first_name }}!</h2>
+    <p>Ваш заказ успешно оплачен. Билет прикреплён к этому письму в формате PDF.</p>
+
+    <div class="info-row"><span class="info-label">Мероприятие</span><strong>{{ event.title }}</strong></div>
+    <div class="info-row"><span class="info-label">Дата и время</span><strong>{{ event.starts_at|date:"d.m.Y H:i" }} МСК</strong></div>
+    <div class="info-row"><span class="info-label">Место</span><strong>{{ event.venue_name }}, {{ event.venue_city }}</strong></div>
+    <div class="info-row"><span class="info-label">Тип билета</span><strong>{{ order.ticket_type.name }}</strong></div>
+    <div class="info-row"><span class="info-label">Номер заказа</span><strong>{{ order.order_number }}</strong></div>
+    <div class="info-row"><span class="info-label">Номер билета</span><strong>{{ ticket.ticket_number }}</strong></div>
+    <div class="info-row"><span class="info-label">Код проверки</span><strong>{{ ticket.verify_code }}</strong></div>
+
+    <div class="qr-section">
+      <p><strong>Предъявите QR-код на входе</strong></p>
+      <p style="color:#666;font-size:13px">Ваш PDF-билет прикреплён ниже.<br>Также вы можете открыть билет по ссылке:</p>
+    </div>
+
+    <a href="{{ verify_url }}" class="btn">Открыть билет онлайн</a>
+
+    <p style="color:#666;font-size:13px">
+      Если у вас возникли вопросы, напишите на
+      <a href="mailto:{{ site_url|slice:'8:' }}">поддержку</a>.
+      Правила возврата: <a href="{{ site_url }}/documents/refund/">{{ site_url }}/documents/refund/</a>
+    </p>
+  </div>
+  <div class="footer">
+    &copy; {% now "Y" %} {{ site_name }}. Все права защищены.<br>
+    <a href="{{ site_url }}/documents/privacy/">Политика конфиденциальности</a>
+  </div>
+</div>
+</body>
+</html>

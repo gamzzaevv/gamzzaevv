@@ -1,0 +1,52 @@
+# Core
+Django==5.0.6
+djangorestframework==3.15.2
+django-environ==0.11.2
+psycopg2-binary==2.9.9
+gunicorn==22.0.0
+
+# Admin UI
+django-unfold==0.37.0
+django-import-export==4.1.1
+
+# Auth & Security
+django-allauth==64.3.0
+django-otp==1.5.3
+qrcode[pil]==7.4.2
+django-axes==7.0.0
+django-ratelimit==4.1.0
+django-csp==3.8
+django-cors-headers==4.4.0
+
+# Async tasks
+celery==5.4.0
+redis==5.0.8
+django-celery-beat==2.7.0
+django-celery-results==2.5.1
+
+# Payments
+yookassa==3.3.0
+
+# PDF & QR
+reportlab==4.2.2
+Pillow==10.4.0
+weasyprint==62.3
+
+# Email
+django-anymail==11.1
+
+# Storage
+django-storages==1.14.4
+boto3==1.35.16
+
+# Utilities
+django-extensions==3.2.3
+django-filter==24.3
+phonenumbers==8.13.43
+python-slugify==8.0.4
+shortuuid==1.0.13
+cryptography==43.0.0
+
+# Logging & Monitoring
+sentry-sdk[django]==2.13.0
+structlog==24.4.0

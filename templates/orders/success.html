@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block title %}Заказ оформлен | {{ SITE_NAME }}{% endblock %}
+
+{% block body %}
+<main class="success-page">
+    <div class="container">
+        <div class="success-card">
+            <div class="success-icon">✓</div>
+            <h1>Оплата прошла успешно!</h1>
+            {% if order %}
+            <p>Заказ <strong>{{ order.order_number }}</strong> подтверждён.</p>
+            {% endif %}
+            <p>Билет с QR-кодом отправлен на <strong>{{ order.customer.email }}</strong>.</p>
+            <p class="success-note">Письмо может прийти в течение 5 минут. Проверьте папку «Спам».</p>
+            <a href="/" class="btn btn--secondary">На главную</a>
+        </div>
+    </div>
+</main>
+{% endblock %}

@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Сканер билетов | {{ SITE_NAME }}{% endblock %}
+{% block robots %}noindex,nofollow{% endblock %}
+
+{% block body %}
+<div class="scanner-page">
+    <div class="scanner-header">
+        <h1>🎫 Проверка билетов</h1>
+        <span class="scanner-user">{{ request.user.email }}</span>
+    </div>
+
+    <!-- QR Camera Scanner -->
+    <div class="scanner-video-wrap">
+        <video id="scanner-video" playsinline></video>
+        <div class="scanner-overlay">
+            <div class="scanner-frame"></div>
+        </div>
+    </div>
+
+    <!-- Manual input fallback -->
+    <div class="scanner-manual">
+        <form id="manual-form">
+            {% csrf_token %}
+            <input type="text" id="manual-token" placeholder="Введите токен или код билета" maxlength="200">
+            <button type="submit" class="btn btn--primary">Проверить</button>
+        </form>
+    </div>
+
+    <!-- Result panel -->
+    <div id="scan-result" class="scan-result" style="display:none">
+        <div id="result-icon" class="result-icon"></div>
+        <div id="result-message" class="result-message"></div>
+        <div id="result-details" class="result-details"></div>
+        <button id="scan-again" class="btn btn--secondary">Следующий</button>
+    </div>
+
+    <!-- Log table -->
+    <div class="scan-log">
+        <h3>Последние сканирования</h3>
+        <table id="log-table">
+            <thead><tr><th>Время</th><th>Билет</th><th>Результат</th></tr></thead>
+            <tbody id="log-body"></tbody>
+        </table>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js" integrity="sha256-..." crossorigin="anonymous"></script>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+const CSRF = document.cookie.match(/csrftoken=([^;]+)/)?.[1] || "";
+let scanning = true;
+const video = document.getElementById("scanner-video");
+const resultDiv = document.getElementById("scan-result");
+const logBody = document.getElementById("log-body");
+
+async function validateToken(token) {
+    const fd = new FormData();
+    fd.append("token", token);
+    fd.append("csrfmiddlewaretoken", CSRF);
+    const resp = await fetch("{% url 'checkin:validate' %}", {method: "POST", body: fd});
+    return resp.json();
+}
+
+function showResult(data) {
+    scanning = false;
+    resultDiv.style.display = "block";
+    const icon = document.getElementById("result-icon");
+    const msg = document.getElementById("result-message");
+    const det = document.getElementById("result-details");
+
+    icon.textContent = data.is_valid ? "✓" : "✗";
+    icon.className = "result-icon " + (data.is_valid ? "result-icon--ok" : "result-icon--fail");
+    msg.textContent = data.message;
+
+    if (data.ticket) {
+        const t = data.ticket;
+        det.innerHTML = `<b>${t.holder}</b><br>${t.ticket_type} · ${t.number}<br>${t.event_date}`;
+    } else {
+        det.textContent = "";
+    }
+
+    // Add to log
+    const row = logBody.insertRow(0);
+    row.innerHTML = `<td>${new Date().toLocaleTimeString("ru")}</td><td>${data.ticket?.number || "—"}</td><td>${data.message}</td>`;
+
+    // Auto-resume after 3s
+    setTimeout(() => { scanning = true; resultDiv.style.display = "none"; }, 3000);
+}
+
+// Camera
+navigator.mediaDevices.getUserMedia({video: {facingMode: "environment"}}).then(stream => {
+    video.srcObject = stream;
+    video.play();
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+    function tick() {
+        if (video.readyState === video.HAVE_ENOUGH_DATA && scanning) {
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            const img = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const code = jsQR(img.data, img.width, img.height, {inversionAttempts: "dontInvert"});
+            if (code) {
+                const url = code.data;
+                const token = url.split("/").filter(Boolean).pop();
+                if (token) validateToken(token).then(showResult);
+            }
+        }
+        requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+}).catch(() => { document.querySelector(".scanner-video-wrap").style.display = "none"; });
+
+// Manual form
+document.getElementById("manual-form").addEventListener("submit", async e => {
+    e.preventDefault();
+    const token = document.getElementById("manual-token").value.trim();
+    if (!token) return;
+    const data = await validateToken(token);
+    showResult(data);
+    e.target.reset();
+});
+
+document.getElementById("scan-again").addEventListener("click", () => {
+    scanning = true;
+    resultDiv.style.display = "none";
+});
+</script>
+{% endblock %}

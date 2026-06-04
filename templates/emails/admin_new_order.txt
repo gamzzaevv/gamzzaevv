@@ -1,0 +1,10 @@
+Новый заказ: {{ order.order_number }}
+
+Покупатель: {{ customer.full_name }}
+Email: {{ customer.email }}
+Телефон: {{ customer.phone }}
+
+Мероприятие: {{ event.title }}
+Тип билета: {{ order.ticket_type.name }}
+Сумма: {{ order.total_amount }} ₽
+Билет №: {{ ticket.ticket_number }}
