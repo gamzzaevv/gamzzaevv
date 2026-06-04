@@ -42,7 +42,8 @@ def create_payment(order: Order) -> Payment:
         },
         "confirmation": {
             "type": "redirect",
-            "return_url": settings.YOOKASSA_RETURN_URL,
+            # Pass order number back so the success page can look up status.
+            "return_url": f"{settings.YOOKASSA_RETURN_URL}?order={order.order_number}",
         },
         "capture": True,
         "description": f"Билет на мероприятие — заказ {order.order_number}",

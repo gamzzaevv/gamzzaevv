@@ -1,5 +1,6 @@
 import logging
 from django.contrib import messages
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_http_methods
 from django.utils.decorators import method_decorator
@@ -61,11 +62,38 @@ class CreateOrderView(View):
 
 
 def order_success(request):
+    """
+    Landing page after returning from YooKassa.
+
+    IMPORTANT: returning here does NOT mean the payment succeeded — YooKassa
+    redirects here regardless of outcome, and the real confirmation arrives
+    asynchronously via webhook. So we render the actual order status and let
+    the page poll /orders/status/ until the webhook lands.
+    """
     order_number = request.GET.get("order")
     order = None
     if order_number:
-        order = Order.objects.filter(order_number=order_number).first()
+        order = (
+            Order.objects.select_related("customer")
+            .filter(order_number=order_number)
+            .first()
+        )
     return render(request, "orders/success.html", {"order": order})
+
+
+def order_status_api(request):
+    """Lightweight JSON endpoint polled by the success page."""
+    order_number = request.GET.get("order", "")
+    order = Order.objects.filter(order_number=order_number).first()
+    if not order:
+        return JsonResponse({"found": False}, status=404)
+    return JsonResponse({
+        "found": True,
+        "status": order.status,
+        "is_paid": order.status == Order.STATUS_PAID,
+        "order_number": order.order_number,
+        "email": order.customer.email,
+    })
 
 
 def ticket_detail(request, token):

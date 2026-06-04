@@ -112,10 +112,15 @@
   </main>
 </template>
 
-<!-- ── 3. SUCCESS ───────────────────────────────────────────── -->
+<!-- ── 3. SUCCESS (3 состояния — реальный статус заказа) ─────── -->
 <template id="success">
   <main class="success-page">
-    <div class="container">
+    <div class="container" style="display:flex;flex-direction:column;gap:24px;padding:40px 20px">
+      <p style="text-align:center;color:#6B7280;font-size:.85rem">
+        Страница /orders/success/ показывает реальный статус и сама опрашивает сервер,
+        пока не придёт подтверждение от YooKassa (webhook). Ниже — все три состояния:
+      </p>
+      <!-- PAID -->
       <div class="success-card">
         <div class="success-icon">✓</div>
         <h1>Оплата прошла успешно!</h1>
@@ -123,6 +128,21 @@
         <p>Билет с QR-кодом отправлен на <strong>ivan@example.com</strong>.</p>
         <p class="success-note">Письмо может прийти в течение 5 минут. Проверьте папку «Спам».</p>
         <a href="#" class="btn btn--secondary">На главную</a>
+      </div>
+      <!-- PENDING -->
+      <div class="success-card">
+        <div class="success-icon" style="background:#dbeafe;color:#1e40af">⟳</div>
+        <h1>Обрабатываем платёж…</h1>
+        <p>Заказ <strong>FN-20261215-04217</strong></p>
+        <p class="success-note">Это занимает несколько секунд. Страница обновится автоматически.</p>
+      </div>
+      <!-- FAILED -->
+      <div class="success-card">
+        <div class="success-icon" style="background:#fee2e2;color:#991b1b">✗</div>
+        <h1>Оплата не прошла</h1>
+        <p>Заказ <strong>FN-20261215-04217</strong> не был оплачен.</p>
+        <p class="success-note">Средства не списаны. Вы можете попробовать оформить заказ заново.</p>
+        <a href="#" class="btn btn--primary">Вернуться к билетам</a>
       </div>
     </div>
   </main>
