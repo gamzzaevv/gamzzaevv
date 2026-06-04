@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fight Night Tickets — Превью всех экранов</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap">
+<link rel="stylesheet" href="../static/css/main.css">
+<style>
+  /* ── Preview shell (НЕ часть продакшн-сайта) ─────────────────── */
+  html, body { height: 100%; }
+  body { background: #0f0f1e; font-family: Inter, sans-serif; }
+  .pv-nav {
+    position: sticky; top: 0; z-index: 9999; background: #0f0f1e;
+    display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+    padding: 10px 16px; border-bottom: 1px solid #2a2a3e;
+  }
+  .pv-nav__brand { color: #E94560; font-weight: 900; margin-right: 8px; white-space: nowrap; font-size: .95rem; }
+  .pv-nav button {
+    background: transparent; color: #aaa; border: 1px solid #333; border-radius: 6px;
+    padding: 7px 13px; font-size: .82rem; cursor: pointer; white-space: nowrap;
+    font-family: Inter, sans-serif; transition: .15s;
+  }
+  .pv-nav button:hover { color: #fff; border-color: #555; }
+  .pv-nav button.active { background: #E94560; color: #fff; border-color: #E94560; }
+  .pv-nav__sep { flex: 1; }
+  .pv-nav__mode button.active { background: #2563eb; border-color: #2563eb; }
+
+  .pv-stage { display: flex; justify-content: center; align-items: flex-start;
+    padding: 24px; min-height: calc(100vh - 56px); transition: .25s; }
+  .pv-stage.mobile { padding: 32px 16px; }
+  #pv-frame {
+    width: 100%; max-width: 1200px; height: calc(100vh - 110px);
+    border: none; background: #fff; border-radius: 8px; box-shadow: 0 12px 48px rgba(0,0,0,.4);
+    transition: width .25s, border-radius .25s;
+  }
+  .pv-stage.mobile #pv-frame {
+    width: 390px; height: 780px; max-width: 390px;
+    border: 10px solid #000; border-radius: 36px;
+  }
+  .pv-hint { color: #777; font-size: .78rem; text-align: center; padding: 6px; }
+</style>
+</head>
+<body>
+
+<nav class="pv-nav">
+  <span class="pv-nav__brand">🥊 PREVIEW</span>
+  <button data-screen="landing" class="active">1. Лендинг</button>
+  <button data-screen="checkout">2. Оформление</button>
+  <button data-screen="success">3. Успех</button>
+  <button data-screen="ticket">4. Билет</button>
+  <button data-screen="scanner">5. Сканер</button>
+  <button data-screen="legal">6. Юр. страница</button>
+  <span class="pv-nav__sep"></span>
+  <span class="pv-nav__mode" style="display:flex;gap:6px">
+    <button data-mode="desktop" class="active" id="m-desk">🖥 Десктоп</button>
+    <button data-mode="mobile" id="m-mob">📱 Мобильный</button>
+  </span>
+</nav>
+
+<div class="pv-stage" id="pv-stage">
+  <iframe id="pv-frame" src="screens.html?s=landing"></iframe>
+</div>
+<p class="pv-hint">Переключай экраны и режим «Десктоп / Мобильный» — в мобильном режиме реально срабатывают CSS media-запросы.</p>
+
+<script>
+let current = "landing";
+const frame = document.getElementById("pv-frame");
+const stage = document.getElementById("pv-stage");
+
+document.querySelectorAll(".pv-nav button[data-screen]").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".pv-nav button[data-screen]").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    current = btn.dataset.screen;
+    frame.src = "screens.html?s=" + current;
+  });
+});
+
+document.getElementById("m-desk").addEventListener("click", () => {
+  stage.classList.remove("mobile");
+  document.getElementById("m-desk").classList.add("active");
+  document.getElementById("m-mob").classList.remove("active");
+});
+document.getElementById("m-mob").addEventListener("click", () => {
+  stage.classList.add("mobile");
+  document.getElementById("m-mob").classList.add("active");
+  document.getElementById("m-desk").classList.remove("active");
+});
+</script>
+</body>
+</html>
