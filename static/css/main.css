@@ -38,7 +38,7 @@ body { font-family: var(--font); color: var(--text); background: var(--white); l
 .hero__badge { background: var(--accent); color: var(--white); padding: 4px 14px; border-radius: 99px; font-size: .85rem; font-weight: 700; }
 .hero__title { color: var(--white); font-size: clamp(2rem, 6vw, 4rem); font-weight: 900; margin: 16px 0; line-height: 1.15; }
 .hero__fighter-names { color: var(--white); font-size: clamp(1.1rem, 3vw, 1.6rem); font-weight: 700; margin-bottom: 16px; }
-.hero__vs-x { color: var(--accent); font-style: italic; }
+.hero__fighter-sep { color: var(--accent); font-weight: 900; }
 .hero__meta { color: #ddd; font-size: 1.1rem; margin-bottom: 8px; }
 .hero__doors { color: #aaa; font-size: .95rem; margin-bottom: 32px; }
 

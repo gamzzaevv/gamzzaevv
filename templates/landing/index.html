@@ -19,7 +19,7 @@
         <h1 class="hero__title">{{ event.title }}</h1>
         {% if event.fighter_name or event.opponent_name %}
         <p class="hero__fighter-names">
-            {{ event.fighter_name }}<span class="hero__vs-x"> vs </span>{{ event.opponent_name }}
+            {{ event.fighter_name }}<span class="hero__fighter-sep"> — </span>{{ event.opponent_name }}
         </p>
         {% endif %}
         <p class="hero__meta">📍 {{ event.venue_name }}, {{ event.venue_city }}</p>
