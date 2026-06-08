@@ -47,31 +47,40 @@
             {% for day in fight_days %}
             {% with tt=day.primary_ticket_type %}
             <div class="day-card {% if day.total_available <= 0 %}day-card--sold-out{% endif %}">
-                <div class="day-card__date">
+                <div class="day-card__head">
+                    <span class="day-card__daynum">{{ day.starts_at|date:"d" }}</span>
+                    <span class="day-card__month">{{ day.starts_at|date:"E" }}</span>
                     <span class="day-card__weekday">{{ day.starts_at|date:"l" }}</span>
-                    <span class="day-card__num">{{ day.starts_at|date:"d E" }}</span>
                 </div>
-                <h3 class="day-card__title">{{ day.title }}</h3>
-                <p class="day-card__time">🕒 Начало в {{ day.starts_at|date:"H:i" }} МСК</p>
-                {% if tt %}
-                <p class="day-card__price">{{ tt.price|floatformat:0 }} ₽ / билет</p>
-                <div class="day-card__availability">
-                    {% if day.total_available <= 0 %}
-                        <span class="badge badge--sold-out">Билеты закончились</span>
+                <div class="day-card__body">
+                    <h3 class="day-card__title">{{ day.title }}</h3>
+                    <p class="day-card__time">🕒 Начало в {{ day.starts_at|date:"H:i" }} МСК</p>
+                    {% if tt %}
+                    <div class="day-card__price-row">
+                        <span class="day-card__price">{{ tt.price|floatformat:0 }} ₽</span>
+                        <span class="day-card__price-label">за билет</span>
+                    </div>
+                    <div class="day-card__avail">
+                        {% if day.total_available <= 0 %}
+                            <span class="badge badge--sold-out">Билеты закончились</span>
+                        {% else %}
+                            <div class="avail-bar">
+                                <div class="avail-bar__fill" style="width: {% widthratio day.total_available tt.total_quantity 100 %}%"></div>
+                            </div>
+                            <span class="avail-text">Осталось <strong>{{ day.total_available }}</strong> из {{ tt.total_quantity }} мест</span>
+                        {% endif %}
+                    </div>
+                    {% if day.total_available > 0 %}
+                    <a href="{% url 'orders:create' tt.id %}" class="btn btn--primary btn--full">
+                        Купить за {{ tt.price|floatformat:0 }} ₽
+                    </a>
                     {% else %}
-                        <span class="badge badge--available">Осталось мест: {{ day.total_available }} из {{ tt.total_quantity }}</span>
+                    <button class="btn btn--disabled btn--full" disabled>Нет в наличии</button>
+                    {% endif %}
+                    {% else %}
+                    <p class="text-center">Билеты скоро появятся в продаже</p>
                     {% endif %}
                 </div>
-                {% if day.total_available > 0 %}
-                <a href="{% url 'orders:create' tt.id %}" class="btn btn--primary btn--full">
-                    Купить билет за {{ tt.price|floatformat:0 }} ₽
-                </a>
-                {% else %}
-                <button class="btn btn--disabled btn--full" disabled>Нет в наличии</button>
-                {% endif %}
-                {% else %}
-                <p class="text-center">Билеты скоро появятся в продаже</p>
-                {% endif %}
             </div>
             {% endwith %}
             {% empty %}

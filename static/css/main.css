@@ -22,8 +22,8 @@ body { font-family: var(--font); color: var(--text); background: var(--white); l
 .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px;
   padding: 12px 24px; border-radius: 8px; font-weight: 600; font-size: 1rem;
   border: none; cursor: pointer; text-decoration: none; transition: .2s; white-space: nowrap; }
-.btn--primary { background: var(--accent); color: var(--white); }
-.btn--primary:hover { background: var(--accent-hover); }
+.btn--primary { background: var(--accent); color: var(--white); box-shadow: 0 6px 18px rgba(233,69,96,.28); }
+.btn--primary:hover { background: var(--accent-hover); transform: translateY(-2px); box-shadow: 0 10px 26px rgba(233,69,96,.36); }
 .btn--secondary { background: transparent; border: 2px solid var(--accent); color: var(--accent); }
 .btn--secondary:hover { background: var(--accent); color: var(--white); }
 .btn--lg { padding: 16px 36px; font-size: 1.1rem; }
@@ -53,23 +53,52 @@ body { font-family: var(--font); color: var(--text); background: var(--white); l
   box-shadow: 0 0 0 6px rgba(244,244,248,.15); }
 
 /* ── Fight days (date selection) ──────────────────────────────── */
-.fight-days__intro { text-align: center; color: var(--text-muted); margin-top: -32px; margin-bottom: 40px; }
-.fight-days__grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; }
-.day-card { border: 2px solid #eee; border-radius: var(--radius); padding: 28px; background: var(--white);
-  box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 10px; transition: .2s; text-align: center; }
-.day-card:hover { transform: translateY(-4px); box-shadow: 0 8px 32px rgba(0,0,0,.16); }
-.day-card--sold-out { opacity: .65; }
-.day-card__date { display: flex; flex-direction: column; align-items: center; }
-.day-card__weekday { color: var(--accent); font-weight: 700; text-transform: capitalize; font-size: .9rem; letter-spacing: .05em; }
-.day-card__num { font-size: 1.6rem; font-weight: 900; text-transform: capitalize; }
-.day-card__title { font-size: 1.1rem; font-weight: 700; }
-.day-card__time { color: var(--text-muted); font-size: .9rem; }
-.day-card__price { font-size: 1.3rem; font-weight: 900; color: var(--accent); }
-.day-card__availability { margin-bottom: 4px; }
+.fight-days { background: var(--bg); }
+.fight-days__intro { text-align: center; color: var(--text-muted); margin-top: -32px; margin-bottom: 44px; font-size: 1.05rem; }
+.fight-days__grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 380px));
+  gap: 28px; justify-content: center; }
+
+.day-card { background: var(--white); border-radius: 18px; overflow: hidden;
+  box-shadow: 0 10px 30px rgba(26,26,46,.10); border: 1px solid rgba(26,26,46,.06);
+  display: flex; flex-direction: column; transition: transform .22s ease, box-shadow .22s ease; }
+.day-card:hover { transform: translateY(-6px); box-shadow: 0 18px 44px rgba(233,69,96,.18); }
+.day-card--sold-out { opacity: .7; }
+.day-card--sold-out:hover { transform: none; box-shadow: 0 10px 30px rgba(26,26,46,.10); }
+
+/* Calendar-style header */
+.day-card__head { position: relative; background: linear-gradient(135deg, var(--brand) 0%, #2d2d54 100%);
+  color: var(--white); padding: 26px 28px 22px; text-align: center; }
+.day-card__head::after { content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 14px;
+  background: radial-gradient(circle at 10px -2px, transparent 10px, var(--white) 11px) repeat-x;
+  background-size: 22px 14px; }
+.day-card__daynum { display: block; font-size: 3.2rem; font-weight: 900; line-height: 1; }
+.day-card__month { display: block; text-transform: uppercase; letter-spacing: .12em;
+  font-size: .85rem; font-weight: 700; color: var(--accent); margin-top: 4px; }
+.day-card__weekday { display: block; text-transform: capitalize; font-size: .85rem; color: #b9b9cc; margin-top: 2px; }
+
+/* Card body */
+.day-card__body { padding: 26px 28px 28px; display: flex; flex-direction: column; gap: 12px; flex: 1; }
+.day-card__title { font-size: 1.25rem; font-weight: 800; }
+.day-card__time { color: var(--text-muted); font-size: .95rem; }
+.day-card__price-row { display: flex; align-items: baseline; gap: 8px; margin-top: 4px; }
+.day-card__price { font-size: 2rem; font-weight: 900; color: var(--accent); line-height: 1; }
+.day-card__price-label { color: var(--text-muted); font-size: .9rem; }
+.day-card__avail { margin: 6px 0 4px; }
+
+/* Availability progress bar */
+.avail-bar { height: 8px; border-radius: 99px; background: #ececf3; overflow: hidden; margin-bottom: 8px; }
+.avail-bar__fill { height: 100%; border-radius: 99px;
+  background: linear-gradient(90deg, #16a34a, #4ade80); transition: width .4s ease; }
+.avail-text { font-size: .9rem; color: var(--text-muted); }
+.avail-text strong { color: var(--text); }
+.day-card .btn { margin-top: auto; }
 
 /* ── Sections ────────────────────────────────────────────────── */
 .section { padding: 80px 0; }
-.section__title { font-size: clamp(1.6rem, 4vw, 2.4rem); font-weight: 800; text-align: center; margin-bottom: 48px; }
+.section__title { font-size: clamp(1.6rem, 4vw, 2.4rem); font-weight: 800; text-align: center; margin-bottom: 48px; position: relative; }
+.section__title::after { content: ""; display: block; width: 56px; height: 4px; border-radius: 99px;
+  background: var(--accent); margin: 16px auto 0; }
+.about__body { max-width: 720px; margin: 0 auto; text-align: center; color: var(--text-muted); font-size: 1.05rem; }
 
 /* ── Ticket cards ────────────────────────────────────────────── */
 .tickets__grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; }
