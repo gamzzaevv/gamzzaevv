@@ -18,6 +18,29 @@ class EventAdmin(ModelAdmin):
     prepopulated_fields = {"slug": ("title",)}
     inlines = [TicketTypeInline]
     readonly_fields = ["created_at", "updated_at"]
+    fieldsets = (
+        ("Основное", {
+            "fields": ("title", "slug", "description", "short_description",
+                       "starts_at", "doors_open_at")
+        }),
+        ("Площадка", {
+            "fields": ("venue_name", "venue_address", "venue_city", "venue_map_url")
+        }),
+        ("Изображения", {
+            "fields": ("poster", "banner")
+        }),
+        ("Бойцы (фото на фон страницы)", {
+            "fields": ("fighter_name", "fighter_photo", "opponent_name", "opponent_photo"),
+            "description": "Загрузите фото бойцов — они будут показаны на фоне баннера события.",
+        }),
+        ("Состояние", {
+            "fields": ("is_published", "is_active")
+        }),
+        ("Служебное", {
+            "fields": ("created_at", "updated_at"),
+            "classes": ("collapse",),
+        }),
+    )
 
 
 @admin.register(PromoCode)

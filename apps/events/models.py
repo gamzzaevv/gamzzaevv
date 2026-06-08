@@ -26,6 +26,16 @@ class Event(TimestampedModel):
     poster = models.ImageField("Постер", upload_to="events/posters/", null=True, blank=True)
     banner = models.ImageField("Баннер", upload_to="events/banners/", null=True, blank=True)
 
+    # Fighters (показываются на фоне страницы события)
+    fighter_name = models.CharField("Боец 1 — имя", max_length=255, blank=True)
+    fighter_photo = models.ImageField(
+        "Боец 1 — фото", upload_to="events/fighters/", null=True, blank=True
+    )
+    opponent_name = models.CharField("Боец 2 — имя", max_length=255, blank=True)
+    opponent_photo = models.ImageField(
+        "Боец 2 — фото", upload_to="events/fighters/", null=True, blank=True
+    )
+
     # State
     is_published = models.BooleanField("Опубликовано", default=False, db_index=True)
     is_active = models.BooleanField("Активно", default=True)
@@ -41,6 +51,14 @@ class Event(TimestampedModel):
     @property
     def is_upcoming(self) -> bool:
         return self.starts_at > timezone.now()
+
+    @property
+    def primary_ticket_type(self):
+        return self.ticket_types.filter(is_visible=True).order_by("sort_order").first()
+
+    @property
+    def total_available(self) -> int:
+        return sum(tt.available_quantity for tt in self.ticket_types.all())
 
 
 class TicketType(TimestampedModel):

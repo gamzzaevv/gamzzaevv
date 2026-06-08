@@ -36,13 +36,13 @@ class CreateOrderView(View):
         try:
             order = create_order(
                 ticket_type=tt,
-                quantity=d.get("quantity", 1),
+                quantity=1,
                 first_name=d["first_name"],
                 last_name=d["last_name"],
                 patronymic=d.get("patronymic", ""),
                 email=d["email"],
                 phone=d.get("phone", ""),
-                promo_code=d.get("promo_code"),
+                promo_code=None,
                 ip_address=ip,
                 user_agent=request.META.get("HTTP_USER_AGENT", ""),
                 consent=d["consent"],

@@ -59,21 +59,6 @@
                     {{ form.phone }}
                 </div>
 
-                <div class="form-group {% if form.quantity.errors %}form-group--error{% endif %}">
-                    <label>{{ form.quantity.label }} *</label>
-                    {{ form.quantity }}
-                    {% if form.quantity.errors %}<span class="form-error">{{ form.quantity.errors.0 }}</span>{% endif %}
-                </div>
-
-                <div class="form-group">
-                    <label>{{ form.promo_code.label }}</label>
-                    <div class="promo-wrap">
-                        {{ form.promo_code }}
-                        <button type="button" id="promo-check" class="btn btn--secondary">Применить</button>
-                    </div>
-                    <span id="promo-result"></span>
-                </div>
-
                 <div class="form-group form-group--checkbox {% if form.consent.errors %}form-group--error{% endif %}">
                     {{ form.consent }}
                     <label for="{{ form.consent.id_for_label }}">{{ form.consent.label|safe }}</label>
@@ -100,20 +85,3 @@
 </main>
 {% endblock %}
 
-{% block extra_scripts %}
-<script>
-document.getElementById("promo-check").addEventListener("click", async () => {
-    const code = document.querySelector("[name=promo_code]").value.trim();
-    if (!code) return;
-    const resp = await fetch("/api/v1/orders/promo/validate/", {
-        method: "POST",
-        headers: {"Content-Type": "application/json", "X-CSRFToken": "{{ csrf_token }}"},
-        body: JSON.stringify({code})
-    });
-    const data = await resp.json();
-    const el = document.getElementById("promo-result");
-    el.textContent = data.message;
-    el.className = data.valid ? "promo-success" : "promo-error";
-});
-</script>
-{% endblock %}

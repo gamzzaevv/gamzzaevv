@@ -32,13 +32,40 @@ body { font-family: var(--font); color: var(--text); background: var(--white); l
 
 /* ── Hero ────────────────────────────────────────────────────── */
 .hero { min-height: 90vh; display: flex; align-items: center; position: relative;
-  background: var(--brand) no-repeat center / cover; }
+  background: var(--brand) no-repeat center / cover; overflow: hidden; }
 .hero__overlay { position: absolute; inset: 0; background: rgba(26,26,46,.75); }
 .hero__content { position: relative; z-index: 1; text-align: center; padding: 60px 20px; max-width: 800px; margin: 0 auto; }
 .hero__badge { background: var(--accent); color: var(--white); padding: 4px 14px; border-radius: 99px; font-size: .85rem; font-weight: 700; }
 .hero__title { color: var(--white); font-size: clamp(2rem, 6vw, 4rem); font-weight: 900; margin: 16px 0; line-height: 1.15; }
+.hero__fighter-names { color: var(--white); font-size: clamp(1.1rem, 3vw, 1.6rem); font-weight: 700; margin-bottom: 16px; }
+.hero__vs-x { color: var(--accent); font-style: italic; }
 .hero__meta { color: #ddd; font-size: 1.1rem; margin-bottom: 8px; }
 .hero__doors { color: #aaa; font-size: .95rem; margin-bottom: 32px; }
+
+/* Split fighter-photo background ("VS" hero) */
+.hero__fighters { position: absolute; inset: 0; display: flex; }
+.hero__fighter { flex: 1; background: #0d0d18 no-repeat center / cover; position: relative; }
+.hero__fighter--left { background-position: center 20%; clip-path: polygon(0 0, 100% 0, 92% 100%, 0% 100%); }
+.hero__fighter--right { background-position: center 20%; clip-path: polygon(8% 0, 100% 0, 100% 100%, 0% 100%); }
+.hero__vs-badge { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  z-index: 2; background: var(--accent); color: var(--white); font-weight: 900; font-size: 1.4rem;
+  width: 64px; height: 64px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 0 0 6px rgba(244,244,248,.15); }
+
+/* ── Fight days (date selection) ──────────────────────────────── */
+.fight-days__intro { text-align: center; color: var(--text-muted); margin-top: -32px; margin-bottom: 40px; }
+.fight-days__grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; }
+.day-card { border: 2px solid #eee; border-radius: var(--radius); padding: 28px; background: var(--white);
+  box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 10px; transition: .2s; text-align: center; }
+.day-card:hover { transform: translateY(-4px); box-shadow: 0 8px 32px rgba(0,0,0,.16); }
+.day-card--sold-out { opacity: .65; }
+.day-card__date { display: flex; flex-direction: column; align-items: center; }
+.day-card__weekday { color: var(--accent); font-weight: 700; text-transform: capitalize; font-size: .9rem; letter-spacing: .05em; }
+.day-card__num { font-size: 1.6rem; font-weight: 900; text-transform: capitalize; }
+.day-card__title { font-size: 1.1rem; font-weight: 700; }
+.day-card__time { color: var(--text-muted); font-size: .9rem; }
+.day-card__price { font-size: 1.3rem; font-weight: 900; color: var(--accent); }
+.day-card__availability { margin-bottom: 4px; }
 
 /* ── Sections ────────────────────────────────────────────────── */
 .section { padding: 80px 0; }
