@@ -20,6 +20,16 @@ MIDDLEWARE.insert(1, "debug_toolbar.middleware.DebugToolbarMiddleware")  # noqa:
 
 INTERNAL_IPS = ["127.0.0.1"]
 
+# Отключаем панель перехвата редиректов: она показывает страницу-заглушку
+# "DJDT перехватил редирект…" после КАЖДОГО действия в админке (сохранение,
+# массовые операции и т.п.), что сбивает с толку нетехнического пользователя.
+# Остальные панели отладчика остаются включены.
+DEBUG_TOOLBAR_CONFIG = {
+    "DISABLE_PANELS": {
+        "debug_toolbar.panels.redirects.RedirectsPanel",
+    },
+}
+
 CACHES = {
     "default": {
         "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
