@@ -13,6 +13,8 @@ from reportlab.lib import colors
 from reportlab.lib.pagesizes import A5
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.units import mm
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.pdfgen import canvas
 from reportlab.platypus import Image, Paragraph
 
@@ -25,6 +27,18 @@ ACCENT_COLOR = colors.HexColor("#E94560")
 LIGHT_GRAY = colors.HexColor("#F4F4F8")
 
 PAGE_W, PAGE_H = A5
+
+# Встроенные шрифты ReportLab (Helvetica и т.п.) не содержат кириллицу —
+# русский текст рисовался квадратиками. Регистрируем DejaVu Sans, в котором
+# кириллица есть, и используем его вместо Helvetica везде в этом модуле.
+FONT_REGULAR = "DejaVuSans"
+FONT_BOLD = "DejaVuSans-Bold"
+
+_FONTS_DIR = Path(settings.BASE_DIR) / "static" / "fonts"
+if FONT_REGULAR not in pdfmetrics.getRegisteredFontNames():
+    pdfmetrics.registerFont(TTFont(FONT_REGULAR, _FONTS_DIR / "DejaVuSans.ttf"))
+    pdfmetrics.registerFont(TTFont(FONT_BOLD, _FONTS_DIR / "DejaVuSans-Bold.ttf"))
+    pdfmetrics.registerFontFamily(FONT_REGULAR, normal=FONT_REGULAR, bold=FONT_BOLD)
 
 
 def generate_pdf(ticket: Ticket) -> None:
@@ -46,16 +60,16 @@ def generate_pdf(ticket: Ticket) -> None:
     c.rect(0, PAGE_H - 30 * mm, PAGE_W, 30 * mm, fill=1, stroke=0)
 
     c.setFillColor(colors.white)
-    c.setFont("Helvetica-Bold", 18)
+    c.setFont(FONT_BOLD, 18)
     c.drawCentredString(PAGE_W / 2, PAGE_H - 18 * mm, settings.SITE_NAME.upper())
 
     # ── Event title ───────────────────────────────────────────────
-    c.setFont("Helvetica-Bold", 14)
+    c.setFont(FONT_BOLD, 14)
     c.setFillColor(colors.white)
     _draw_wrapped(c, event.title, PAGE_W / 2, PAGE_H - 42 * mm, 12, PAGE_W - 20 * mm)
 
     # ── Event details ─────────────────────────────────────────────
-    c.setFont("Helvetica", 10)
+    c.setFont(FONT_REGULAR, 10)
     c.setFillColor(LIGHT_GRAY)
     y = PAGE_H - 60 * mm
     details = [
@@ -76,12 +90,12 @@ def generate_pdf(ticket: Ticket) -> None:
     y -= 8 * mm
 
     # ── Buyer info ────────────────────────────────────────────────
-    c.setFont("Helvetica-Bold", 10)
+    c.setFont(FONT_BOLD, 10)
     c.setFillColor(colors.white)
     c.drawString(10 * mm, y, customer.full_name)
     y -= 5 * mm
 
-    c.setFont("Helvetica", 9)
+    c.setFont(FONT_REGULAR, 9)
     c.setFillColor(LIGHT_GRAY)
     c.drawString(10 * mm, y, f"Тип: {order.ticket_type.name}")
     y -= 5 * mm
@@ -96,14 +110,14 @@ def generate_pdf(ticket: Ticket) -> None:
     c.drawImage(qr_img, qr_x, qr_y, 35 * mm, 35 * mm)
 
     # Verify code below QR
-    c.setFont("Helvetica-Bold", 8)
+    c.setFont(FONT_BOLD, 8)
     c.setFillColor(LIGHT_GRAY)
     c.drawCentredString(qr_x + 17.5 * mm, qr_y - 5 * mm, ticket.verify_code)
 
     # ── Footer ────────────────────────────────────────────────────
     c.setFillColor(ACCENT_COLOR)
     c.rect(0, 0, PAGE_W, 10 * mm, fill=1, stroke=0)
-    c.setFont("Helvetica", 7)
+    c.setFont(FONT_REGULAR, 7)
     c.setFillColor(colors.white)
     c.drawCentredString(PAGE_W / 2, 3.5 * mm, f"ЭЛЕКТРОННЫЙ БИЛЕТ • {settings.SITE_NAME}")
 
@@ -136,12 +150,12 @@ def _make_qr_image(data: str, size: float):
 
 def _draw_wrapped(c, text: str, x: float, y: float, font_size: int, max_width: float):
     """Naive word-wrap for canvas.drawString."""
-    c.setFont("Helvetica-Bold", font_size)
+    c.setFont(FONT_BOLD, font_size)
     words = text.split()
     line = ""
     for word in words:
         test = f"{line} {word}".strip()
-        if c.stringWidth(test, "Helvetica-Bold", font_size) <= max_width:
+        if c.stringWidth(test, FONT_BOLD, font_size) <= max_width:
             line = test
         else:
             c.drawCentredString(x, y, line)
