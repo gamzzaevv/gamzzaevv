@@ -3,6 +3,15 @@ from .base import *  # noqa: F401, F403
 DEBUG = True
 ALLOWED_HOSTS = ["*"]
 
+# Local SQLite database, always next to manage.py — avoids the
+# django-environ "sqlite:///" -> "/db.sqlite3" (filesystem root) gotcha.
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": BASE_DIR / "db.sqlite3",  # noqa: F405
+    }
+}
+
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
 INSTALLED_APPS += ["debug_toolbar"]  # noqa: F405
