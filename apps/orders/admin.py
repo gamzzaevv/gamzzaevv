@@ -39,6 +39,12 @@ def _badge(text, colors):
     )
 
 
+@admin.display(description="PDF")
+def pdf_link(obj):
+    url = reverse("admin:orders_ticket_download_pdf", args=[obj.pk])
+    return format_html('<a href="{}" target="_blank">📄 Скачать / посмотреть</a>', url)
+
+
 # ─── Экспорт заказов в Excel/CSV ─────────────────────────────────────────────
 @admin.action(description="📥 Скачать выбранные заказы (Excel/CSV)")
 def export_csv(modeladmin, request, queryset):
@@ -68,8 +74,8 @@ class TicketInline(TabularInline):
     can_delete = False
     tab = True
     verbose_name_plural = "Билеты в этом заказе"
-    fields = ["ticket_number", "status_badge", "verify_code", "email_sent_at"]
-    readonly_fields = ["ticket_number", "status_badge", "verify_code", "email_sent_at"]
+    fields = ["ticket_number", "status_badge", "verify_code", pdf_link, "email_sent_at"]
+    readonly_fields = ["ticket_number", "status_badge", "verify_code", pdf_link, "email_sent_at"]
 
     def has_add_permission(self, request, obj=None):
         return False
@@ -150,7 +156,7 @@ class CustomerAdmin(ModelAdmin):
 @admin.register(Ticket)
 class TicketAdmin(ModelAdmin):
     list_display = ["ticket_number", "buyer", "buyer_email", "event_day",
-                    "status_badge", "pdf_link", "email_sent_at", "created_at"]
+                    "status_badge", pdf_link, "email_sent_at", "created_at"]
     list_display_links = ["ticket_number", "buyer"]
     list_filter = ["status", "order__ticket_type__event"]
     search_fields = ["ticket_number", "verify_code", "order__order_number",
@@ -181,9 +187,11 @@ class TicketAdmin(ModelAdmin):
         if not ticket.pdf_file:
             generate_pdf(ticket)
             ticket.refresh_from_db()
+        # as_attachment=False — открывается прямо в новой вкладке браузера
+        # (можно посмотреть билет, а сохранить — через меню браузера).
         return FileResponse(
             ticket.pdf_file.open("rb"),
-            as_attachment=True,
+            as_attachment=False,
             filename=f"bilet_{ticket.ticket_number}.pdf",
         )
 
@@ -203,11 +211,6 @@ class TicketAdmin(ModelAdmin):
     def status_badge(self, obj):
         return _badge(obj.get_status_display(),
                       _TICKET_STATUS_COLORS.get(obj.status, ("#374151", "#e5e7eb")))
-
-    @admin.display(description="PDF")
-    def pdf_link(self, obj):
-        url = reverse("admin:orders_ticket_download_pdf", args=[obj.pk])
-        return format_html('<a href="{}" target="_blank">📄 Скачать</a>', url)
 
     # ── Действие: отправить билет на e-mail (с исправлением адреса) ───────────
     @admin.action(description="✉️ Отправить билет на e-mail…")
