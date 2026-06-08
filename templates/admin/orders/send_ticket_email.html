@@ -1,0 +1,37 @@
+{% extends "admin/base_site.html" %}
+
+{% block content %}
+<div style="max-width:560px">
+    <p>Билет(ы) будут отправлены PDF-файлом на указанный адрес.
+       Если покупатель ошибся в почте — впишите правильный адрес ниже.</p>
+
+    <ul style="margin:16px 0;padding-left:18px">
+        {% for t in tickets %}
+        <li><strong>{{ t.ticket_number }}</strong> — {{ t.order.customer.full_name }}
+            (текущий e-mail: {{ t.order.customer.email }})</li>
+        {% endfor %}
+    </ul>
+
+    <form method="post">
+        {% csrf_token %}
+        {% for pk in selected %}
+        <input type="hidden" name="_selected_action" value="{{ pk }}">
+        {% endfor %}
+        <input type="hidden" name="action" value="send_to_email">
+
+        <label for="recipient_email" style="display:block;font-weight:600;margin-bottom:6px">
+            E-mail для отправки
+        </label>
+        <input type="email" id="recipient_email" name="recipient_email"
+               value="{{ prefill }}" required
+               style="width:100%;padding:10px 12px;border:1.5px solid #ccc;border-radius:8px;font-size:1rem;margin-bottom:16px">
+
+        <div style="display:flex;gap:12px">
+            <button type="submit" name="apply" value="1" class="button" style="background:#E94560;color:#fff;border:none;padding:10px 22px;border-radius:8px;font-weight:600;cursor:pointer">
+                Отправить билет
+            </button>
+            <a href="../" class="button" style="padding:10px 22px">Отмена</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

@@ -4,6 +4,7 @@ Base settings shared across all environments.
 from pathlib import Path
 
 import environ
+from django.urls import reverse_lazy
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
@@ -248,11 +249,97 @@ SITE_ID = 1
 # ─── Django Unfold Admin ─────────────────────────────────────────────────────
 
 UNFOLD = {
-    "SITE_TITLE": "Fight Night Admin",
-    "SITE_HEADER": "Fight Night",
+    "SITE_TITLE": "Управление билетами",
+    "SITE_HEADER": "Билеты Fight Night",
     "SITE_SYMBOL": "sports_mma",
     "SHOW_HISTORY": True,
     "SHOW_VIEW_ON_SITE": True,
+    "SIDEBAR": {
+        "show_search": True,
+        "navigation": [
+            {
+                "title": "Продажи",
+                "separator": True,
+                "items": [
+                    {
+                        "title": "Заказы",
+                        "icon": "receipt_long",
+                        "link": reverse_lazy("admin:orders_order_changelist"),
+                    },
+                    {
+                        "title": "Билеты",
+                        "icon": "confirmation_number",
+                        "link": reverse_lazy("admin:orders_ticket_changelist"),
+                    },
+                    {
+                        "title": "Покупатели",
+                        "icon": "group",
+                        "link": reverse_lazy("admin:orders_customer_changelist"),
+                    },
+                ],
+            },
+            {
+                "title": "Мероприятие",
+                "separator": True,
+                "items": [
+                    {
+                        "title": "Дни боёв",
+                        "icon": "stadium",
+                        "link": reverse_lazy("admin:events_event_changelist"),
+                    },
+                    {
+                        "title": "Промокоды",
+                        "icon": "local_offer",
+                        "link": reverse_lazy("admin:events_promocode_changelist"),
+                    },
+                ],
+            },
+            {
+                "title": "Контроль на входе",
+                "separator": True,
+                "items": [
+                    {
+                        "title": "Журнал проверок",
+                        "icon": "qr_code_scanner",
+                        "link": reverse_lazy("admin:checkin_checkinlog_changelist"),
+                    },
+                ],
+            },
+            {
+                "title": "Контент",
+                "separator": True,
+                "items": [
+                    {
+                        "title": "Документы (оферта и пр.)",
+                        "icon": "description",
+                        "link": reverse_lazy("admin:documents_documentpage_changelist"),
+                    },
+                ],
+            },
+            {
+                "title": "Служебное",
+                "separator": True,
+                "collapsible": True,
+                "items": [
+                    {
+                        "title": "Платежи",
+                        "icon": "payments",
+                        "link": reverse_lazy("admin:payments_payment_changelist"),
+                    },
+                    {
+                        "title": "Письма (email)",
+                        "icon": "mail",
+                        "link": reverse_lazy("admin:notifications_emaillog_changelist"),
+                    },
+                    {
+                        "title": "Сотрудники",
+                        "icon": "manage_accounts",
+                        "link": reverse_lazy("admin:accounts_user_changelist"),
+                    },
+                ],
+            },
+        ],
+    },
 }
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
