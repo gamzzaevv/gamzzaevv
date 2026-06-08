@@ -104,6 +104,39 @@ class OrderAdmin(ModelAdmin):
                        "unit_price", "discount_amount", "total_amount",
                        "ip_address", "created_at", "updated_at"]
 
+    def save_model(self, request, obj, form, change):
+        """
+        Если сотрудник вручную меняет статус заказа на «Оплачен» (например,
+        оплата пришла на карту/счёт мимо сайта), сразу выпускаем билеты —
+        генерируем PDF и отправляем письмо покупателю, как при обычной онлайн-оплате.
+        """
+        became_paid = (
+            change and "status" in form.changed_data
+            and obj.status == Order.STATUS_PAID
+        )
+        super().save_model(request, obj, form, change)
+        if became_paid:
+            self._issue_tickets(obj)
+            self.message_user(
+                request,
+                "Заказ отмечен оплаченным — билеты выпущены, письмо с PDF отправлено покупателю."
+            )
+
+    @staticmethod
+    def _issue_tickets(order):
+        from apps.orders.service import create_tickets_for_order
+        from tasks.payment_tasks import generate_ticket_pdf
+
+        tt = order.ticket_type
+        if tt.reserved_quantity > 0:
+            moved = min(order.quantity, tt.reserved_quantity)
+            tt.reserved_quantity -= moved
+            tt.sold_quantity += moved
+            tt.save(update_fields=["reserved_quantity", "sold_quantity", "updated_at"])
+
+        for ticket in create_tickets_for_order(order):
+            generate_ticket_pdf.delay(str(ticket.id))
+
     @admin.display(description="Покупатель", ordering="customer__last_name")
     def buyer(self, obj):
         return obj.customer.full_name
