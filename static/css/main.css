@@ -47,11 +47,6 @@ body { font-family: var(--font); color: var(--text); background: var(--white); l
 .hero__fighter { flex: 1; background: #0d0d18 no-repeat center / cover; position: relative; }
 .hero__fighter--left { background-position: center 20%; clip-path: polygon(0 0, 100% 0, 92% 100%, 0% 100%); }
 .hero__fighter--right { background-position: center 20%; clip-path: polygon(8% 0, 100% 0, 100% 100%, 0% 100%); }
-.hero__vs-badge { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-  z-index: 2; background: var(--accent); color: var(--white); font-weight: 900; font-size: 1.4rem;
-  width: 64px; height: 64px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
-  box-shadow: 0 0 0 6px rgba(244,244,248,.15); }
-
 /* ── Fight days (date selection) ──────────────────────────────── */
 .fight-days { background: var(--bg); }
 .fight-days__intro { text-align: center; color: var(--text-muted); margin-top: -32px; margin-bottom: 44px; font-size: 1.05rem; }
