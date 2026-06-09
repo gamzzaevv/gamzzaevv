@@ -47,15 +47,15 @@ class Command(BaseCommand):
         )
         days = [
             dict(
-                slug="fight-night-day-1",
-                title="Fight Night — День 1",
+                slug="mmastart-day-1",
+                title="MMA Start — День 1",
                 starts_at=timezone.make_aware(datetime.datetime(year, 6, 13, 18, 0)),
                 short_description="Первый день турнира",
                 description="Первый день главного боя сезона. Открывающие поединки.",
             ),
             dict(
-                slug="fight-night-day-2",
-                title="Fight Night — День 2",
+                slug="mmastart-day-2",
+                title="MMA Start — День 2",
                 starts_at=timezone.make_aware(datetime.datetime(year, 6, 14, 18, 0)),
                 short_description="Финальный день турнира — главный бой",
                 description="Второй, решающий день турнира. Главный бой вечера.",
@@ -98,7 +98,7 @@ class Command(BaseCommand):
             ("consent", "Согласие на обработку ПД",
              "<h2>Согласие</h2><p>Нажимая кнопку, вы даёте согласие на обработку персональных данных.</p>"),
             ("legal", "Реквизиты",
-             "<h2>Реквизиты</h2><p>ООО «Файт Найт», ИНН: 7700000000, ОГРН: 1234567890123.</p>"),
+             "<h2>Реквизиты</h2><p>Укажите ваши реквизиты: наименование, ИНН, ОГРН/ОГРНИП, адрес.</p>"),
             ("cookies", "Политика cookies",
              "<h2>Cookies</h2><p>Сайт использует файлы cookie для корректной работы.</p>"),
             ("delivery", "Доставка и оплата",

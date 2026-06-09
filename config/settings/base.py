@@ -19,7 +19,7 @@ DEBUG = env("DJANGO_DEBUG")
 ALLOWED_HOSTS = env.list("DJANGO_ALLOWED_HOSTS", default=["localhost", "127.0.0.1"])
 
 SITE_URL = env("SITE_URL", default="http://localhost:8000")
-SITE_NAME = env("SITE_NAME", default="Fight Night Tickets")
+SITE_NAME = env("SITE_NAME", default="MMA Start")
 
 # ─── Application definition ──────────────────────────────────────────────────
 
@@ -250,7 +250,7 @@ SITE_ID = 1
 
 UNFOLD = {
     "SITE_TITLE": "Управление билетами",
-    "SITE_HEADER": "Билеты Fight Night",
+    "SITE_HEADER": "Билеты MMA Start",
     "SITE_SYMBOL": "sports_mma",
     "SHOW_HISTORY": True,
     "SHOW_VIEW_ON_SITE": True,
