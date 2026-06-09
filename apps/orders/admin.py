@@ -109,18 +109,31 @@ class OrderAdmin(ModelAdmin):
         Если сотрудник вручную меняет статус заказа на «Оплачен» (например,
         оплата пришла на карту/счёт мимо сайта), сразу выпускаем билеты —
         генерируем PDF и отправляем письмо покупателю, как при обычной онлайн-оплате.
+        При смене статуса с «Оплачен» на «Отменён»/«Возврат» — возвращаем билеты в продажу.
         """
         became_paid = (
             change and "status" in form.changed_data
             and obj.status == Order.STATUS_PAID
         )
+        # Снимок статуса ДО сохранения нужен для определения возврата
+        old_status = None
+        if change and "status" in form.changed_data:
+            old_status = form.initial.get("status")
+
         super().save_model(request, obj, form, change)
+
         if became_paid:
             self._issue_tickets(obj)
             self.message_user(
                 request,
                 "Заказ отмечен оплаченным — билеты выпущены, письмо с PDF отправлено покупателю."
             )
+        elif (
+            old_status == Order.STATUS_PAID
+            and obj.status in (Order.STATUS_CANCELED, Order.STATUS_REFUNDED)
+        ):
+            self._restore_sold_quantity(obj)
+            self.message_user(request, "Билеты возвращены в продажу — счётчик обновлён.")
 
     @staticmethod
     def _issue_tickets(order):
@@ -136,6 +149,36 @@ class OrderAdmin(ModelAdmin):
 
         for ticket in create_tickets_for_order(order):
             generate_ticket_pdf.delay(str(ticket.id))
+
+    @staticmethod
+    def _restore_sold_quantity(order):
+        from django.db.models import F
+        from django.db.models.functions import Greatest
+        from django.db.models import Value
+        from apps.events.models import TicketType
+        TicketType.objects.filter(pk=order.ticket_type_id).update(
+            sold_quantity=Greatest(F("sold_quantity") - order.quantity, Value(0)),
+        )
+
+    def delete_model(self, request, obj):
+        if obj.status == Order.STATUS_PAID:
+            self._restore_sold_quantity(obj)
+        super().delete_model(request, obj)
+
+    def delete_queryset(self, request, queryset):
+        from collections import defaultdict
+        restore = defaultdict(int)
+        for order in queryset.filter(status=Order.STATUS_PAID):
+            restore[order.ticket_type_id] += order.quantity
+        for tt_id, count in restore.items():
+            from django.db.models import F
+            from django.db.models.functions import Greatest
+            from django.db.models import Value
+            from apps.events.models import TicketType
+            TicketType.objects.filter(pk=tt_id).update(
+                sold_quantity=Greatest(F("sold_quantity") - count, Value(0)),
+            )
+        super().delete_queryset(request, queryset)
 
     @admin.display(description="Покупатель", ordering="customer__last_name")
     def buyer(self, obj):
@@ -289,9 +332,23 @@ class TicketAdmin(ModelAdmin):
 
     @admin.action(description="Отменить выбранные билеты")
     def cancel_ticket(self, request, queryset):
-        updated = queryset.filter(status=Ticket.STATUS_ISSUED).update(
-            status=Ticket.STATUS_CANCELED
-        )
+        from collections import defaultdict
+        from django.db.models import F, Value
+        from django.db.models.functions import Greatest
+        from apps.events.models import TicketType
+
+        to_cancel = queryset.filter(status=Ticket.STATUS_ISSUED).select_related("order")
+        restore = defaultdict(int)
+        for ticket in to_cancel:
+            if ticket.order.status == Order.STATUS_PAID:
+                restore[ticket.order.ticket_type_id] += 1
+
+        updated = to_cancel.update(status=Ticket.STATUS_CANCELED)
+
+        for tt_id, count in restore.items():
+            TicketType.objects.filter(pk=tt_id).update(
+                sold_quantity=Greatest(F("sold_quantity") - count, Value(0)),
+            )
         self.message_user(request, f"Отменено билетов: {updated}")
 
     @admin.action(description="Перегенерировать PDF")
