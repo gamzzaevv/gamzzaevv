@@ -82,7 +82,7 @@ class Order(TimestampedModel):
     def generate_order_number(cls) -> str:
         ts = timezone.now().strftime("%Y%m%d")
         rand = secrets.randbelow(100000)
-        return f"FN-{ts}-{rand:05d}"
+        return f"MMA-{ts}-{rand:05d}"
 
     def is_expired(self) -> bool:
         return self.status == self.STATUS_PENDING and timezone.now() > self.expires_at

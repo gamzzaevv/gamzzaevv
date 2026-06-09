@@ -1,6 +1,7 @@
 """
 Base settings shared across all environments.
 """
+from datetime import timedelta
 from pathlib import Path
 
 import environ
@@ -229,7 +230,7 @@ REST_FRAMEWORK = {
 # ─── Axes (Brute Force Protection) ───────────────────────────────────────────
 
 AXES_FAILURE_LIMIT = 5
-AXES_COOLOFF_TIME = 1  # 1 hour
+AXES_COOLOFF_TIME = timedelta(hours=1)
 AXES_LOCKOUT_TEMPLATE = "accounts/lockout.html"
 AXES_RESET_ON_SUCCESS = True
 

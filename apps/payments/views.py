@@ -40,10 +40,9 @@ def yookassa_webhook(request):
     """Receive and queue YooKassa webhook notifications."""
     ip = _get_ip(request)
 
-    # Optional IP restriction (enable in production)
-    # if not _ip_allowed(ip):
-    #     logger.warning("webhook_blocked_ip", extra={"ip": ip})
-    #     return HttpResponseForbidden()
+    if not _ip_allowed(ip):
+        logger.warning("webhook_blocked_ip", extra={"ip": ip})
+        return HttpResponseForbidden()
 
     raw_body = request.body
     if not raw_body:

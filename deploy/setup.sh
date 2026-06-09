@@ -31,8 +31,9 @@ if ! id "${PROJECT_USER}" &>/dev/null; then
 fi
 
 echo "==> [3/9] Создаём директории проекта..."
-mkdir -p "${PROJECT_DIR}" /var/log/mmastart
+mkdir -p "${PROJECT_DIR}" "${PROJECT_DIR}/staticfiles" "${PROJECT_DIR}/media" /var/log/mmastart
 chown -R "${PROJECT_USER}:${PROJECT_USER}" "${PROJECT_DIR}" /var/log/mmastart
+chmod 755 "${PROJECT_DIR}/staticfiles" "${PROJECT_DIR}/media"
 
 echo "==> [4/9] Копируем файлы проекта..."
 # Если запускаете из директории с архивом:
@@ -58,13 +59,17 @@ if [ ! -f "${PROJECT_DIR}/.env" ]; then
 fi
 
 echo "==> [6/9] Настраиваем MySQL..."
+DB_PASS=$(python3 -c "import secrets,string; print(''.join(secrets.choice(string.ascii_letters+string.digits) for _ in range(32)))")
 mysql -u root <<EOF
 CREATE DATABASE IF NOT EXISTS ticket_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-CREATE USER IF NOT EXISTS 'ticket_user'@'localhost' IDENTIFIED BY 'CHANGE_ME_PASSWORD';
+CREATE USER IF NOT EXISTS 'ticket_user'@'localhost' IDENTIFIED BY '${DB_PASS}';
+ALTER USER 'ticket_user'@'localhost' IDENTIFIED BY '${DB_PASS}';
 GRANT ALL PRIVILEGES ON ticket_db.* TO 'ticket_user'@'localhost';
 FLUSH PRIVILEGES;
 EOF
-echo "  !! Обязательно смените пароль ticket_user в MySQL и обновите DATABASE_URL в .env"
+# Вписываем сгенерированный пароль в .env
+sed -i "s|DATABASE_URL=.*|DATABASE_URL=mysql://ticket_user:${DB_PASS}@localhost:3306/ticket_db|" "${PROJECT_DIR}/.env"
+echo "  ✓ Пароль БД сгенерирован и записан в .env автоматически"
 
 echo "==> [7/9] Настраиваем Python virtualenv и устанавливаем зависимости..."
 sudo -u "${PROJECT_USER}" python${PYTHON_VERSION} -m venv "${PROJECT_DIR}/venv"
@@ -86,6 +91,23 @@ cp "${DEPLOY_DIR}/celery_beat.service"   /etc/systemd/system/mmastart-celery-bea
 systemctl daemon-reload
 systemctl enable  mmastart-gunicorn mmastart-celery-worker mmastart-celery-beat
 systemctl start   mmastart-gunicorn mmastart-celery-worker mmastart-celery-beat
+
+echo "==> [8b] Настраиваем ротацию логов..."
+cat > /etc/logrotate.d/mmastart <<'LOGROTATE'
+/var/log/mmastart/*.log {
+    daily
+    rotate 14
+    compress
+    delaycompress
+    notifempty
+    missingok
+    create 0640 mmastart mmastart
+    sharedscripts
+    postrotate
+        systemctl reload mmastart-gunicorn mmastart-celery-worker mmastart-celery-beat > /dev/null 2>&1 || true
+    endscript
+}
+LOGROTATE
 
 echo "==> [9/9] Настраиваем nginx и SSL (Let's Encrypt)..."
 cp "${DEPLOY_DIR}/nginx.conf" /etc/nginx/sites-available/${DOMAIN}

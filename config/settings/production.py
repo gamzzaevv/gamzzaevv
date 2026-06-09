@@ -33,13 +33,15 @@ CSP_FRAME_SRC = ("https://yookassa.ru",)
 
 # ─── Sentry ──────────────────────────────────────────────────────────────────
 
-sentry_sdk.init(
-    dsn=env("SENTRY_DSN", default=""),  # noqa: F405
-    integrations=[DjangoIntegration(), CeleryIntegration()],
-    traces_sample_rate=0.1,
-    send_default_pii=False,
-    environment="production",
-)
+_sentry_dsn = env("SENTRY_DSN", default="")  # noqa: F405
+if _sentry_dsn:
+    sentry_sdk.init(
+        dsn=_sentry_dsn,
+        integrations=[DjangoIntegration(), CeleryIntegration()],
+        traces_sample_rate=0.1,
+        send_default_pii=False,
+        environment="production",
+    )
 
 # ─── S3 Storage (Yandex Object Storage) ──────────────────────────────────────
 
