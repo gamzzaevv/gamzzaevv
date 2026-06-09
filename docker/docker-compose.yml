@@ -2,16 +2,18 @@ version: "3.9"
 
 services:
   db:
-    image: postgres:16-alpine
+    image: mysql:8.0
     restart: unless-stopped
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - mysql_data:/var/lib/mysql
     environment:
-      POSTGRES_DB: ticket_db
-      POSTGRES_USER: ticket_user
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      MYSQL_DATABASE: ticket_db
+      MYSQL_USER: ticket_user
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ticket_user -d ticket_db"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "ticket_user", "--password=${DB_PASSWORD}"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -66,5 +68,5 @@ services:
       - redis
 
 volumes:
-  postgres_data:
+  mysql_data:
   redis_data:

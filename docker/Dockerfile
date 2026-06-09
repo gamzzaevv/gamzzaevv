@@ -4,9 +4,9 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     PIP_NO_CACHE_DIR=1
 
-# System deps for WeasyPrint / psycopg2
+# System deps for WeasyPrint / mysqlclient
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential libpq-dev libffi-dev libssl-dev \
+    build-essential default-libmysqlclient-dev pkg-config libffi-dev libssl-dev \
     libcairo2 libpango-1.0-0 libpangocairo-1.0-0 libgdk-pixbuf2.0-0 libglib2.0-0 \
     && rm -rf /var/lib/apt/lists/*
 

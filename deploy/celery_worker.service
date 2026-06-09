@@ -1,0 +1,20 @@
+[Unit]
+Description=Celery Worker — MMA Start
+After=network.target redis.service mysql.service
+
+[Service]
+User=mmastart
+Group=mmastart
+WorkingDirectory=/var/www/mmastart
+EnvironmentFile=/var/www/mmastart/.env
+ExecStart=/var/www/mmastart/venv/bin/celery \
+    -A config worker \
+    -l info \
+    --concurrency 4 \
+    -Q celery,emails,payments \
+    --logfile /var/log/mmastart/celery-worker.log
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

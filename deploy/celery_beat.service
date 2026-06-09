@@ -1,0 +1,19 @@
+[Unit]
+Description=Celery Beat — MMA Start
+After=network.target redis.service mysql.service
+
+[Service]
+User=mmastart
+Group=mmastart
+WorkingDirectory=/var/www/mmastart
+EnvironmentFile=/var/www/mmastart/.env
+ExecStart=/var/www/mmastart/venv/bin/celery \
+    -A config beat \
+    -l info \
+    --scheduler django_celery_beat.schedulers:DatabaseScheduler \
+    --logfile /var/log/mmastart/celery-beat.log
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
