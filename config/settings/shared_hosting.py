@@ -52,9 +52,12 @@ CACHES = {
     }
 }
 
-# ── MySQL: без постоянных соединений на shared hosting ───────────────────────
+# ── MySQL: strict mode + без постоянных соединений на shared hosting ─────────
 
 DATABASES["default"]["CONN_MAX_AGE"] = 0  # noqa: F405
+DATABASES["default"].setdefault("OPTIONS", {})["init_command"] = (  # noqa: F405
+    "SET sql_mode='STRICT_TRANS_TABLES'"
+)
 
 # ── Celery: синхронный режим, воркер и брокер не нужны ───────────────────────
 # Все .delay() и .apply_async() выполняются мгновенно в текущем процессе.
