@@ -1,0 +1,22 @@
+[Unit]
+Description=Gunicorn — MMA Start (mmastart.ru)
+After=network.target mysql.service
+
+[Service]
+User=mmastart
+Group=mmastart
+WorkingDirectory=/var/www/mmastart
+EnvironmentFile=/var/www/mmastart/.env
+ExecStart=/var/www/mmastart/venv/bin/gunicorn \
+    config.wsgi:application \
+    --bind 127.0.0.1:8000 \
+    --workers 4 \
+    --timeout 120 \
+    --access-logfile /var/log/mmastart/gunicorn-access.log \
+    --error-logfile  /var/log/mmastart/gunicorn-error.log
+ExecReload=/bin/kill -s HUP $MAINPID
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

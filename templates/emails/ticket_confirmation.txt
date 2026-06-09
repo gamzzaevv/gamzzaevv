@@ -1,0 +1,21 @@
+Здравствуйте, {{ customer.first_name }}!
+
+Ваш заказ успешно оплачен. Билет прикреплён к этому письму.
+
+ДЕТАЛИ ЗАКАЗА
+=============
+Мероприятие: {{ event.title }}
+Дата: {{ event.starts_at|date:"d.m.Y H:i" }} МСК
+Место: {{ event.venue_name }}, {{ event.venue_city }}
+Тип билета: {{ order.ticket_type.name }}
+Номер заказа: {{ order.order_number }}
+Номер билета: {{ ticket.ticket_number }}
+Код проверки: {{ ticket.verify_code }}
+
+Ссылка на билет: {{ verify_url }}
+
+По вопросам: {{ site_url }}
+
+---
+{{ site_name }} | {{ site_url }}
+Политика конфиденциальности: {{ site_url }}/documents/privacy/

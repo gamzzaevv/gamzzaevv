@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ page.title }} | {{ SITE_NAME }}{% endblock %}
+
+{% block body %}
+<main class="legal-page">
+    <div class="container">
+        <article class="legal-article">
+            <h1>{{ page.title }}</h1>
+            <p class="legal-meta">Версия {{ page.version }} · Актуализировано {{ page.updated_at_display|date:"d.m.Y" }}</p>
+            <div class="legal-content">{{ page.content|safe }}</div>
+        </article>
+        <div class="legal-nav">
+            <a href="{% url 'documents:page' 'offer' %}">Оферта</a>
+            <a href="{% url 'documents:page' 'privacy' %}">Конфиденциальность</a>
+            <a href="{% url 'documents:page' 'refund' %}">Возврат</a>
+            <a href="{% url 'documents:page' 'legal' %}">Реквизиты</a>
+        </div>
+    </div>
+</main>
+{% endblock %}

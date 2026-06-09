@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Оформление заказа — {{ ticket_type.name }} | {{ SITE_NAME }}{% endblock %}
+
+{% block body %}
+<main class="checkout">
+    <div class="container checkout__container">
+        <div class="checkout__summary">
+            <h2>{{ ticket_type.event.title }}</h2>
+            <p>{{ ticket_type.event.starts_at|date:"d E Y, H:i" }} МСК</p>
+            <p>{{ ticket_type.event.venue_name }}</p>
+            <hr>
+            <div class="checkout__ticket-type">
+                <span>{{ ticket_type.name }}</span>
+                <strong>{{ ticket_type.price|floatformat:0 }} ₽</strong>
+            </div>
+        </div>
+
+        <div class="checkout__form-wrap">
+            <h1 class="checkout__title">Оформление билета</h1>
+
+            {% if form.non_field_errors %}
+            <div class="alert alert--error">
+                {% for error in form.non_field_errors %}{{ error }}{% endfor %}
+            </div>
+            {% endif %}
+
+            <form method="post" class="checkout__form" novalidate>
+                {% csrf_token %}
+
+                <div class="form-row">
+                    <div class="form-group {% if form.last_name.errors %}form-group--error{% endif %}">
+                        <label>{{ form.last_name.label }} *</label>
+                        {{ form.last_name }}
+                        {% if form.last_name.errors %}<span class="form-error">{{ form.last_name.errors.0 }}</span>{% endif %}
+                    </div>
+                    <div class="form-group {% if form.first_name.errors %}form-group--error{% endif %}">
+                        <label>{{ form.first_name.label }} *</label>
+                        {{ form.first_name }}
+                        {% if form.first_name.errors %}<span class="form-error">{{ form.first_name.errors.0 }}</span>{% endif %}
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>{{ form.patronymic.label }}</label>
+                    {{ form.patronymic }}
+                </div>
+
+                <div class="form-group {% if form.email.errors %}form-group--error{% endif %}">
+                    <label>{{ form.email.label }} *</label>
+                    {{ form.email }}
+                    <small>Билет придёт на этот адрес</small>
+                    {% if form.email.errors %}<span class="form-error">{{ form.email.errors.0 }}</span>{% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label>{{ form.phone.label }}</label>
+                    {{ form.phone }}
+                </div>
+
+                <div class="form-group form-group--checkbox {% if form.consent.errors %}form-group--error{% endif %}">
+                    {{ form.consent }}
+                    <label for="{{ form.consent.id_for_label }}">{{ form.consent.label|safe }}</label>
+                    {% if form.consent.errors %}<span class="form-error">{{ form.consent.errors.0 }}</span>{% endif %}
+                </div>
+
+                <div class="checkout__total">
+                    <span>Итого к оплате:</span>
+                    <strong>{{ ticket_type.price|floatformat:0 }} ₽</strong>
+                </div>
+
+                <p class="checkout__notice">
+                    Нажимая «Перейти к оплате», вы соглашаетесь с
+                    <a href="{% url 'documents:page' 'offer' %}" target="_blank">офертой</a>.
+                    Оплата производится через YooKassa. Билет поступит на email.
+                </p>
+
+                <button type="submit" class="btn btn--primary btn--lg btn--full">
+                    Перейти к оплате →
+                </button>
+            </form>
+        </div>
+    </div>
+</main>
+{% endblock %}
+

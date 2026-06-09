@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ event.title }} — Купить билет | {{ SITE_NAME }}{% endblock %}
+{% block description %}{{ event.short_description }}{% endblock %}
+
+{% block body %}
+
+<!-- ── HERO (бойцы на фоне) ─────────────────────────────────── -->
+<section class="hero hero--vs">
+    <div class="hero__fighters">
+        <div class="hero__fighter hero__fighter--left" {% if event.fighter_photo %}style="background-image:url('{{ event.fighter_photo.url }}')"{% endif %}></div>
+        <div class="hero__fighter hero__fighter--right" {% if event.opponent_photo %}style="background-image:url('{{ event.opponent_photo.url }}')"{% endif %}></div>
+    </div>
+    <div class="hero__overlay"></div>
+    <div class="hero__content">
+        <span class="hero__badge">Официальные билеты</span>
+        <h1 class="hero__title">{{ event.title }}</h1>
+        {% if event.fighter_name or event.opponent_name %}
+        <p class="hero__fighter-names">
+            {{ event.fighter_name }}<span class="hero__fighter-sep"> — </span>{{ event.opponent_name }}
+        </p>
+        {% endif %}
+        <p class="hero__meta">📍 {{ event.venue_name }}, {{ event.venue_city }}</p>
+        {% if event.doors_open_at %}
+        <p class="hero__doors">Двери открываются в {{ event.doors_open_at|time:"H:i" }}</p>
+        {% endif %}
+        <a href="#fight-days" class="btn btn--primary btn--lg">Купить билет</a>
+    </div>
+</section>
+
+<!-- ── ABOUT ─────────────────────────────────────────────────── -->
+<section class="section about" id="about">
+    <div class="container">
+        <h2 class="section__title">О мероприятии</h2>
+        <div class="about__body">{{ event.description|linebreaks }}</div>
+    </div>
+</section>
+
+<!-- ── FIGHT DAYS (выбор даты + остаток билетов) ────────────── -->
+<section class="section fight-days" id="fight-days">
+    <div class="container">
+        <h2 class="section__title">Выберите день</h2>
+        <p class="fight-days__intro">Бои пройдут два дня подряд — выберите удобную дату.</p>
+        <div class="fight-days__grid">
+            {% for day in fight_days %}
+            {% with tt=day.primary_ticket_type %}
+            <div class="day-card {% if day.total_available <= 0 %}day-card--sold-out{% endif %}">
+                <div class="day-card__head">
+                    <span class="day-card__daynum">{{ day.starts_at|date:"d" }}</span>
+                    <span class="day-card__month">{{ day.starts_at|date:"E" }}</span>
+                    <span class="day-card__weekday">{{ day.starts_at|date:"l" }}</span>
+                </div>
+                <div class="day-card__body">
+                    <h3 class="day-card__title">{{ day.title }}</h3>
+                    <p class="day-card__time">🕒 Начало в {{ day.starts_at|date:"H:i" }} МСК</p>
+                    {% if tt %}
+                    <div class="day-card__price-row">
+                        <span class="day-card__price">{{ tt.price|floatformat:0 }} ₽</span>
+                        <span class="day-card__price-label">за билет</span>
+                    </div>
+                    <div class="day-card__avail">
+                        {% if day.total_available <= 0 %}
+                            <span class="badge badge--sold-out">Билеты закончились</span>
+                        {% else %}
+                            <div class="avail-bar">
+                                <div class="avail-bar__fill" style="width: {% widthratio day.total_available tt.total_quantity 100 %}%"></div>
+                            </div>
+                            <span class="avail-text">Осталось <strong>{{ day.total_available }}</strong> из {{ tt.total_quantity }} мест</span>
+                        {% endif %}
+                    </div>
+                    {% if day.total_available > 0 %}
+                    <a href="{% url 'orders:create' tt.id %}" class="btn btn--primary btn--full">
+                        Купить за {{ tt.price|floatformat:0 }} ₽
+                    </a>
+                    {% else %}
+                    <button class="btn btn--disabled btn--full" disabled>Нет в наличии</button>
+                    {% endif %}
+                    {% else %}
+                    <p class="text-center">Билеты скоро появятся в продаже</p>
+                    {% endif %}
+                </div>
+            </div>
+            {% endwith %}
+            {% empty %}
+            <p class="text-center">Продажа билетов временно недоступна</p>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- ── FAQ ───────────────────────────────────────────────────── -->
+<section class="section faq" id="faq">
+    <div class="container">
+        <h2 class="section__title">Частые вопросы</h2>
+        <details class="faq__item">
+            <summary>Как получить билет после оплаты?</summary>
+            <p>Билет придёт на указанный email в формате PDF в течение нескольких минут.</p>
+        </details>
+        <details class="faq__item">
+            <summary>Можно ли вернуть билет?</summary>
+            <p>Условия возврата описаны в <a href="{% url 'documents:page' 'refund' %}">Правилах возврата</a>.</p>
+        </details>
+        <details class="faq__item">
+            <summary>Как пройти на мероприятие?</summary>
+            <p>Предъявите QR-код из письма или PDF-билет на экране телефона.</p>
+        </details>
+    </div>
+</section>
+
+<!-- ── CONTACT ───────────────────────────────────────────────── -->
+<section class="section contact" id="contact">
+    <div class="container">
+        <h2 class="section__title">Контакты</h2>
+        <p>По вопросам обращайтесь: <a href="mailto:support@{{ request.get_host }}">support@{{ request.get_host }}</a></p>
+    </div>
+</section>
+
+<!-- ── FOOTER ────────────────────────────────────────────────── -->
+<footer class="footer">
+    <div class="container">
+        <div class="footer__legal">
+            <a href="{% url 'documents:page' 'offer' %}">Публичная оферта</a>
+            <a href="{% url 'documents:page' 'privacy' %}">Политика конфиденциальности</a>
+            <a href="{% url 'documents:page' 'consent' %}">Согласие на обработку ПД</a>
+            <a href="{% url 'documents:page' 'refund' %}">Возврат</a>
+            <a href="{% url 'documents:page' 'legal' %}">Реквизиты</a>
+            <a href="{% url 'documents:page' 'cookies' %}">Cookies</a>
+            <a href="{% url 'documents:page' 'delivery' %}">Доставка и оплата</a>
+        </div>
+        <p class="footer__copy">
+            © {% now "Y" %} {{ SITE_NAME }}. Все права защищены.
+            Сайт защищён SSL. Оплата через YooKassa.
+        </p>
+        <p class="footer__disclaimer">
+            Перед покупкой ознакомьтесь с
+            <a href="{% url 'documents:page' 'offer' %}">офертой</a>
+            и <a href="{% url 'documents:page' 'privacy' %}">политикой конфиденциальности</a>.
+        </p>
+    </div>
+</footer>
+
+{% endblock %}

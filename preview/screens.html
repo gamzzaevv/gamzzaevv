@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Экран</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap">
+<link rel="stylesheet" href="../static/css/main.css">
+<style>
+  .info-row{display:flex;justify-content:space-between;border-bottom:1px solid #eee;padding:10px 0}
+  .info-label{color:#666}
+  .pv-mobile-note{display:none}
+</style>
+</head>
+<body>
+
+<!-- ── 1. LANDING ───────────────────────────────────────────── -->
+<template id="landing">
+  <section class="hero" style="background:linear-gradient(135deg,#1a1a2e,#16213e)">
+    <div class="hero__overlay"></div>
+    <div class="hero__content">
+      <span class="hero__badge">Официальные билеты</span>
+      <h1 class="hero__title">FIGHT NIGHT: ВЕЛИКОЕ ПРОТИВОСТОЯНИЕ</h1>
+      <p class="hero__meta">📅 15 декабря 2026, 19:00 МСК &nbsp;|&nbsp; 📍 ЦСКА Арена, Москва</p>
+      <p class="hero__doors">Двери открываются в 18:00</p>
+      <a href="#tickets" class="btn btn--primary btn--lg">Купить билет</a>
+    </div>
+  </section>
+  <section class="section about">
+    <div class="container">
+      <h2 class="section__title">О мероприятии</h2>
+      <div style="max-width:700px;margin:0 auto;text-align:center;color:#6B7280">
+        <p>Главный бой года: два чемпиона сойдутся в октагоне за титул абсолютного чемпиона.
+        Вечер профессиональных боёв, шоу-программа и звёздные гости.</p>
+      </div>
+    </div>
+  </section>
+  <section class="section tickets" id="tickets" style="background:#F4F4F8">
+    <div class="container">
+      <h2 class="section__title">Выберите билет</h2>
+      <div class="tickets__grid">
+        <div class="ticket-card">
+          <div class="ticket-card__header"><span class="ticket-card__type">Standard</span><span class="ticket-card__price">3 000 ₽</span></div>
+          <div class="ticket-card__desc">Трибуны верхнего яруса. Отличный обзор всего октагона.</div>
+          <div class="ticket-card__availability"><span class="badge badge--available">Доступно: 240</span></div>
+          <a href="#" class="btn btn--primary btn--full">Купить за 3 000 ₽</a>
+        </div>
+        <div class="ticket-card">
+          <div class="ticket-card__header"><span class="ticket-card__type">VIP</span><span class="ticket-card__price">8 000 ₽</span></div>
+          <div class="ticket-card__desc">Нижний ярус, близко к рингу. Приветственный напиток включён.</div>
+          <div class="ticket-card__availability"><span class="badge badge--available">Доступно: 48</span></div>
+          <a href="#" class="btn btn--primary btn--full">Купить за 8 000 ₽</a>
+        </div>
+        <div class="ticket-card ticket-card--sold-out">
+          <div class="ticket-card__header"><span class="ticket-card__type">Front Row</span><span class="ticket-card__price">25 000 ₽</span></div>
+          <div class="ticket-card__desc">Первый ряд у октагона. Фото с чемпионом после боя.</div>
+          <div class="ticket-card__availability"><span class="badge badge--sold-out">SOLD OUT</span></div>
+          <button class="btn btn--disabled btn--full" disabled>Нет в наличии</button>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section class="section faq">
+    <div class="container" style="max-width:760px">
+      <h2 class="section__title">Частые вопросы</h2>
+      <details class="faq__item" open><summary>Как получить билет после оплаты?</summary><p>Билет придёт на email в формате PDF в течение нескольких минут.</p></details>
+      <details class="faq__item"><summary>Можно ли вернуть билет?</summary><p>Условия описаны в Правилах возврата.</p></details>
+      <details class="faq__item"><summary>Как пройти на мероприятие?</summary><p>Предъявите QR-код из письма или PDF-билет на экране телефона.</p></details>
+    </div>
+  </section>
+  <footer class="footer">
+    <div class="container">
+      <div class="footer__legal">
+        <a href="#">Публичная оферта</a><a href="#">Политика конфиденциальности</a><a href="#">Согласие на обработку ПД</a>
+        <a href="#">Возврат</a><a href="#">Реквизиты</a><a href="#">Cookies</a><a href="#">Доставка и оплата</a>
+      </div>
+      <p class="footer__copy">© 2026 MMA Start. Все права защищены. Оплата через YooKassa.</p>
+      <p class="footer__disclaimer">Укажите ваши реквизиты · support@mmastart.ru</p>
+    </div>
+  </footer>
+</template>
+
+<!-- ── 2. CHECKOUT ──────────────────────────────────────────── -->
+<template id="checkout">
+  <main class="checkout">
+    <div class="container checkout__container">
+      <div class="checkout__summary">
+        <h2>Fight Night: Великое противостояние</h2>
+        <p>15 декабря 2026, 19:00 МСК</p><p>ЦСКА Арена, Москва</p>
+        <hr style="border-color:#333;margin:16px 0">
+        <div class="checkout__ticket-type"><span>VIP</span><strong>8 000 ₽</strong></div>
+      </div>
+      <div class="checkout__form-wrap">
+        <h1 class="checkout__title">Оформление билета</h1>
+        <form onsubmit="return false">
+          <div class="form-row">
+            <div class="form-group"><label>Фамилия *</label><input type="text" value="Иванов"></div>
+            <div class="form-group"><label>Имя *</label><input type="text" value="Иван"></div>
+          </div>
+          <div class="form-group"><label>Отчество</label><input type="text" placeholder="Иванович (необязательно)"></div>
+          <div class="form-group"><label>Email *</label><input type="email" value="ivan@example.com"><small>Билет придёт на этот адрес</small></div>
+          <div class="form-group"><label>Телефон</label><input type="tel" placeholder="+7 999 000-00-00"></div>
+          <div class="form-group"><label>Количество *</label><input type="number" value="1" min="1" max="10" style="padding:12px 16px;border:1.5px solid #ddd;border-radius:8px;font-size:1rem"></div>
+          <div class="form-group"><label>Промокод</label><div class="promo-wrap"><input type="text" placeholder="Введите код"><button type="button" class="btn btn--secondary">Применить</button></div></div>
+          <div class="form-group form-group--checkbox"><input type="checkbox" id="cons" checked><label for="cons">Я соглашаюсь с <a href="#">офертой</a> и даю согласие на <a href="#">обработку персональных данных</a></label></div>
+          <div class="checkout__total"><span>Итого к оплате:</span><strong>8 000 ₽</strong></div>
+          <p class="checkout__notice">Нажимая «Перейти к оплате», вы соглашаетесь с офертой. Оплата через YooKassa.</p>
+          <button type="submit" class="btn btn--primary btn--lg btn--full">Перейти к оплате →</button>
+        </form>
+      </div>
+    </div>
+  </main>
+</template>
+
+<!-- ── 3. SUCCESS (3 состояния — реальный статус заказа) ─────── -->
+<template id="success">
+  <main class="success-page">
+    <div class="container" style="display:flex;flex-direction:column;gap:24px;padding:40px 20px">
+      <p style="text-align:center;color:#6B7280;font-size:.85rem">
+        Страница /orders/success/ показывает реальный статус и сама опрашивает сервер,
+        пока не придёт подтверждение от YooKassa (webhook). Ниже — все три состояния:
+      </p>
+      <!-- PAID -->
+      <div class="success-card">
+        <div class="success-icon">✓</div>
+        <h1>Оплата прошла успешно!</h1>
+        <p>Заказ <strong>FN-20261215-04217</strong> подтверждён.</p>
+        <p>Билет с QR-кодом отправлен на <strong>ivan@example.com</strong>.</p>
+        <p class="success-note">Письмо может прийти в течение 5 минут. Проверьте папку «Спам».</p>
+        <a href="#" class="btn btn--secondary">На главную</a>
+      </div>
+      <!-- PENDING -->
+      <div class="success-card">
+        <div class="success-icon" style="background:#dbeafe;color:#1e40af">⟳</div>
+        <h1>Обрабатываем платёж…</h1>
+        <p>Заказ <strong>FN-20261215-04217</strong></p>
+        <p class="success-note">Это занимает несколько секунд. Страница обновится автоматически.</p>
+      </div>
+      <!-- FAILED -->
+      <div class="success-card">
+        <div class="success-icon" style="background:#fee2e2;color:#991b1b">✗</div>
+        <h1>Оплата не прошла</h1>
+        <p>Заказ <strong>FN-20261215-04217</strong> не был оплачен.</p>
+        <p class="success-note">Средства не списаны. Вы можете попробовать оформить заказ заново.</p>
+        <a href="#" class="btn btn--primary">Вернуться к билетам</a>
+      </div>
+    </div>
+  </main>
+</template>
+
+<!-- ── 4. TICKET ────────────────────────────────────────────── -->
+<template id="ticket">
+  <main class="legal-page">
+    <div class="container">
+      <article class="legal-article" style="max-width:520px;text-align:center">
+        <h1>🎫 Ваш билет</h1>
+        <h2>Fight Night: Великое противостояние</h2>
+        <p class="legal-meta">15.12.2026 19:00 МСК · ЦСКА Арена, Москва</p>
+        <div class="info-row"><span class="info-label">Владелец</span><strong>Иванов Иван</strong></div>
+        <div class="info-row"><span class="info-label">Тип билета</span><strong>VIP</strong></div>
+        <div class="info-row"><span class="info-label">Номер заказа</span><strong>FN-20261215-04217</strong></div>
+        <div class="info-row"><span class="info-label">Номер билета</span><strong>FN-20261215-04217-01</strong></div>
+        <div class="info-row"><span class="info-label">Код проверки</span><strong>A3F9B2C1D0E5</strong></div>
+        <div class="info-row"><span class="info-label">Статус</span><strong><span style="color:#16a34a">✓ Действителен</span></strong></div>
+        <div style="margin:24px auto;width:160px;height:160px;background:repeating-conic-gradient(#1a1a2e 0% 25%, #fff 0% 50%) 50%/20px 20px;border:8px solid #1a1a2e;border-radius:8px"></div>
+        <a href="#" class="btn btn--primary btn--full">Скачать PDF-билет</a>
+        <p class="success-note" style="margin-top:20px">Предъявите QR-код из PDF или письма на входе.</p>
+      </article>
+    </div>
+  </main>
+</template>
+
+<!-- ── 5. SCANNER ───────────────────────────────────────────── -->
+<template id="scanner">
+  <div class="scanner-page">
+    <div class="scanner-header"><h1 style="font-size:1.2rem">🎫 Проверка билетов</h1><span class="scanner-user" style="font-size:.8rem;color:#888">guard@mmastart.ru</span></div>
+    <div class="scanner-video-wrap" style="background:#0a0a14">
+      <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#444">📷 камера</div>
+      <div class="scanner-overlay"><div class="scanner-frame"></div></div>
+    </div>
+    <div class="scanner-manual"><form onsubmit="return false"><input type="text" placeholder="Введите токен или код билета"><button type="submit" class="btn btn--primary">Проверить</button></form></div>
+    <div class="scan-result" style="display:block;margin-top:16px">
+      <div class="result-icon result-icon--ok">✓</div>
+      <div class="result-message">✓ Билет действителен — добро пожаловать!</div>
+      <div class="result-details"><b>Иванов Иван</b><br>VIP · FN-20261215-04217-01<br>15.12.2026 19:00</div>
+      <button class="btn btn--secondary">Следующий</button>
+    </div>
+    <div class="scan-log">
+      <h3 style="font-size:1rem;margin-top:24px">Последние сканирования</h3>
+      <table>
+        <thead><tr><th>Время</th><th>Билет</th><th>Результат</th></tr></thead>
+        <tbody>
+          <tr><td>19:42:11</td><td>...4217-01</td><td>✓ Действителен</td></tr>
+          <tr><td>19:41:58</td><td>...3980-02</td><td>Уже использован</td></tr>
+          <tr><td>19:41:30</td><td>...1204-01</td><td>✓ Действителен</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</template>
+
+<!-- ── 6. LEGAL ─────────────────────────────────────────────── -->
+<template id="legal">
+  <main class="legal-page">
+    <div class="container">
+      <article class="legal-article">
+        <h1>Публичная оферта</h1>
+        <p class="legal-meta">Версия 1.0 · Актуализировано 04.06.2026</p>
+        <div class="legal-content">
+          <h2>1. Общие положения</h2>
+          <p>Настоящая публичная оферта является официальным предложением ИП Иванов Иван Иванович
+          заключить договор купли-продажи электронных билетов на условиях, изложенных ниже.</p>
+          <h2>2. Предмет договора</h2>
+          <p>Продавец обязуется предоставить Покупателю электронный билет на мероприятие,
+          а Покупатель — оплатить его в порядке, предусмотренном настоящей Офертой.</p>
+          <h2>3. Порядок оплаты</h2>
+          <p>Оплата производится через платёжный сервис YooKassa. После успешной оплаты
+          электронный билет с уникальным QR-кодом направляется на email Покупателя.</p>
+          <h2>4. Реквизиты продавца</h2>
+          <p>ИП Иванов Иван Иванович<br>ИНН 770000000000 · ОГРНИП 300000000000000<br>
+          г. Москва · support@mmastart.ru · +7 999 000-00-00</p>
+        </div>
+        <div class="legal-nav"><a href="#">Оферта</a><a href="#">Конфиденциальность</a><a href="#">Возврат</a><a href="#">Реквизиты</a></div>
+      </article>
+    </div>
+  </main>
+</template>
+
+<div id="root"></div>
+<script>
+  const s = new URLSearchParams(location.search).get("s") || "landing";
+  const tpl = document.getElementById(s) || document.getElementById("landing");
+  document.getElementById("root").appendChild(tpl.content.cloneNode(true));
+</script>
+</body>
+</html>

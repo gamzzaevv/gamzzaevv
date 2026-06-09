@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+
+{% block title %}Статус заказа | {{ SITE_NAME }}{% endblock %}
+{% block robots %}noindex,nofollow{% endblock %}
+
+{% block body %}
+<main class="success-page">
+    <div class="container">
+        {% if not order %}
+        <div class="success-card">
+            <div class="success-icon" style="background:#fef9c3;color:#854d0e">?</div>
+            <h1>Заказ не найден</h1>
+            <p class="success-note">Не удалось определить заказ. Если вы оплатили, билет придёт на email.</p>
+            <a href="/" class="btn btn--secondary">На главную</a>
+        </div>
+        {% else %}
+        <div class="success-card" id="status-card" data-order="{{ order.order_number }}" data-status="{{ order.status }}">
+
+            <!-- PAID -->
+            <div class="status-view" data-view="paid" style="display:none">
+                <div class="success-icon">✓</div>
+                <h1>Оплата прошла успешно!</h1>
+                <p>Заказ <strong>{{ order.order_number }}</strong> подтверждён.</p>
+                <p>Билет с QR-кодом отправлен на <strong>{{ order.customer.email }}</strong>.</p>
+                <p class="success-note">Письмо может прийти в течение 5 минут. Проверьте папку «Спам».</p>
+                <a href="/" class="btn btn--secondary">На главную</a>
+            </div>
+
+            <!-- PENDING (webhook ещё не пришёл) -->
+            <div class="status-view" data-view="pending" style="display:none">
+                <div class="success-icon" style="background:#dbeafe;color:#1e40af">
+                    <span class="spinner">⟳</span>
+                </div>
+                <h1>Обрабатываем платёж…</h1>
+                <p>Заказ <strong>{{ order.order_number }}</strong></p>
+                <p class="success-note">Это занимает несколько секунд. Страница обновится автоматически.</p>
+            </div>
+
+            <!-- FAILED / CANCELED -->
+            <div class="status-view" data-view="failed" style="display:none">
+                <div class="success-icon" style="background:#fee2e2;color:#991b1b">✗</div>
+                <h1>Оплата не прошла</h1>
+                <p>Заказ <strong>{{ order.order_number }}</strong> не был оплачен.</p>
+                <p class="success-note">Средства не списаны. Вы можете попробовать оформить заказ заново.</p>
+                <a href="/" class="btn btn--primary">Вернуться к билетам</a>
+            </div>
+
+        </div>
+        {% endif %}
+    </div>
+</main>
+{% endblock %}
+
+{% block extra_scripts %}
+{% if order %}
+<style>
+.spinner { display:inline-block; animation: spin 1s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+</style>
+<script>
+(function () {
+    const card = document.getElementById("status-card");
+    const orderNo = card.dataset.order;
+    const views = {
+        paid: card.querySelector('[data-view="paid"]'),
+        pending: card.querySelector('[data-view="pending"]'),
+        failed: card.querySelector('[data-view="failed"]'),
+    };
+
+    function show(view) {
+        Object.values(views).forEach(v => v.style.display = "none");
+        (views[view] || views.pending).style.display = "block";
+    }
+
+    function applyStatus(status) {
+        if (status === "paid") { show("paid"); return true; }
+        if (status === "canceled" || status === "expired") { show("failed"); return true; }
+        show("pending");
+        return false;  // keep polling while pending
+    }
+
+    // Initial render from server-side status
+    let done = applyStatus(card.dataset.status);
+
+    // Poll until resolved (webhook may lag a few seconds). Max ~40s.
+    let attempts = 0;
+    const maxAttempts = 20;
+    if (!done) {
+        const timer = setInterval(async () => {
+            attempts++;
+            try {
+                const resp = await fetch("{% url 'orders:status' %}?order=" + encodeURIComponent(orderNo));
+                if (resp.ok) {
+                    const data = await resp.json();
+                    if (applyStatus(data.status)) { clearInterval(timer); return; }
+                }
+            } catch (e) { /* network blip — keep trying */ }
+            if (attempts >= maxAttempts) {
+                clearInterval(timer);
+                // Still pending after 40s — reassure, ticket arrives by email anyway
+                views.pending.querySelector(".success-note").textContent =
+                    "Платёж обрабатывается дольше обычного. Билет придёт на email после подтверждения.";
+            }
+        }, 2000);
+    }
+})();
+</script>
+{% endif %}
+{% endblock %}

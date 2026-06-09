@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="{% block robots %}index,follow{% endblock %}">
+    <title>{% block title %}{{ SITE_NAME }}{% endblock %}</title>
+    <meta name="description" content="{% block description %}Официальная продажа билетов{% endblock %}">
+
+    <!-- Preconnect -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap">
+
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/main.css' %}?v=5">
+    {% block extra_head %}{% endblock %}
+</head>
+<body class="{% block body_class %}{% endblock %}">
+
+{% block body %}{% endblock %}
+
+<!-- Cookie notice -->
+<div id="cookie-notice" class="cookie-notice" style="display:none">
+    <p>Мы используем cookies для корректной работы сайта.
+       <a href="{% url 'documents:page' 'cookies' %}">Подробнее</a></p>
+    <button onclick="acceptCookies()">Принять</button>
+</div>
+
+<script src="{% static 'js/main.js' %}"></script>
+{% block extra_scripts %}{% endblock %}
+</body>
+</html>
